@@ -37,7 +37,16 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
-    public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+    public void resetBoard()
+        vector chess_board = [
+                ["r","h","b","q","k","b","h","r"],
+            ["p","p","p","p","p","p","p","p"],
+            ["","","","","","","",""],
+            ["","","","","","","",""],
+            ["","","","","","","",""],
+            ["","","","","","","",""],
+            ["P","P","P","P","P","P","P","P"],
+            ["R","H","B","K","Q","B","H","R"]]
+
     }
 }
