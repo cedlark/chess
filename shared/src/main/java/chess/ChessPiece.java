@@ -71,12 +71,55 @@ public class ChessPiece {
         for (int r = -1; r <=1; r++;) {
             for (int c = -1; r <= 1; c++;){
                 if (r == 0 && c == 0) continue;
-                tryAdd(board, p, p.getRox() + r, p.getColumn() + c, out, null);
+                tryAdd(board, p, p.getRow() + r, p.getColumn() + c, out, null);
             }
         }
     }
 
     private void knightMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
+        for (int r = -2; r<=2; r++;) {
+            for (int c = -2; c<= 2; c++;) {
+                if (r*c == -2 | r*c == 2) {
+                    tryAdd(board, p, p.getRow() + r, p.getColumn() + c, out, null);
+                }
+            }
+        }
+    }
+    private void bishopMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
+        slideMoves(board, p, out, new int[][]{
+                {1,1},{-1,1},{-1,-1},{1,-1}
+        });
+    }
+    private void rookMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
+        slideMoves(board, p, out, new int [][]{
+                {1,0}, {-1,0}, {0,1}, {0,-1}
+        });
+    }
+    private void queenMoves(ChessBoard board, ChessPiece p, Set <ChessMove> out) {
+        bishopMoves(board, p, out);
+        rookMoves(board, p, out);
+    }
+    private void slideMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out, int [][] directions) {
+        for (int dir : directions) {
+            int r = p.getRow() + dir[0];
+            int c = p.getColumn() + dir[1];
+            while (inBounds(r,c)) {
+                ChessPiece target = board.getPeice(new ChessPosition(r,c));
+                if (target == null) {
+                    out.add(new ChessMove(p, new ChessPosition(r,c), null));
+                } else {
+                    if (target.pieceColor != this.pieceColor) {
+                        out.add(new ChessMove(p, new ChessPosition(r,c), null))
+                    }
+                    break;
+                }
+                r += dir[0];
+                c += dir[1];
 
+            }
+        }
+    }
+    private boolean inBounds(int r, int c) {
+        return r >= 1 && r <= 8 && c >= 1 && c <= 8;
     }
 }
