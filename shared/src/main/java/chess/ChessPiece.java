@@ -119,6 +119,10 @@ public class ChessPiece {
             }
         }
     }
+    private void pawnMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out){
+
+    }
+
     private boolean inBounds(int r, int c) {
         return r >= 1 && r <= 8 && c >= 1 && c <= 8;
     }

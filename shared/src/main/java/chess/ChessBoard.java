@@ -42,17 +42,31 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
 
-    public void resetBoard()
-        vector chess_board = [
-                ["r","h","b","q","k","b","h","r"],
-            ["p","p","p","p","p","p","p","p"],
-            ["","","","","","","",""],
-            ["","","","","","","",""],
-            ["","","","","","","",""],
-            ["","","","","","","",""],
-            ["P","P","P","P","P","P","P","P"],
-            ["R","H","B","K","Q","B","H","R"]]
+    public void resetBoard(){
+        for (int r = 0; r < 8; r++) {
+            Array.fill(board[r], null);
+        }
+        placeBackRank(1, ChessGame.TeamColor.WHITE);
+        for (int c = 1; c <= 8; c++) {
+            addPiece(new ChessPosition(2, c), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+        }
 
+        placeBackRank(8, ChessGame.TeamColor.BLACK);
+        for (int c = 1; c <= 8; c++) {
+            addPiece(new ChessPosition(7, c), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+        }
+    }
+
+    private void placeBackRank(int row, ChessGame.TeamColor color) {
+        addPiece(new ChessPosition(row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+    }
     }
 
     public boolean equals(Object object) {
