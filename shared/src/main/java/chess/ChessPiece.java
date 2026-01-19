@@ -108,7 +108,7 @@ public class ChessPiece {
                 if (target == null) {
                     out.add(new ChessMove(p, new ChessPosition(r,c), null));
                 } else {
-                    if (target.pieceColor != this.pieceColor) {
+                    if (target.getTeamColor() != this.pieceColor) {
                         out.add(new ChessMove(p, new ChessPosition(r,c), null))
                     }
                     break;
@@ -120,7 +120,39 @@ public class ChessPiece {
         }
     }
     private void pawnMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out){
+        int dir = (peiceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startRow = (peiceColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promotionRow = (peiceColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
+        int oneStep = p.getRow() + dir;
+        int twoStep = oneStep + dir;
+        if (inBounds(oneStep, p.getColumn()) && board.getPiece(new ChessPosition(oneStep, p.getColumn())) == null) {
+            movePawn(p, oneStep, p.getColumn(), promotionRow, out);
+            if (p.getRow() == startRow && inBounds(twoStep, p.getColumn())
+                    && board.getPiece(new ChessPosition(twoStep, p.getColumn())) == null) {
+                movePawn(p, twoStep, p.getColumn(), promotionRow, out);
+            }
+        }
+        int sideCol = {p.getColumn() +1,p.getColumn()-1};
+        for (int col : sideCol){
+            if (inBounds(oneStep, col)) continue;
+            ChessPiece target = board.getPiece(new ChessPosition(oneStep, col));
+            if (target != null && target.getTeamColor() != this.pieceColor) {
+                movePawn(p, oneStep, col, promotionRow, out);
+            }
+        }
+    }
+
+    private void movePawn(ChessPosition start, int endRow, int endCol, int promotionRow, Set<ChessMove> out) {
+        ChessPosition end = new ChessPosition(endRow, endCol);
+        if (endRow == promotionRow) {
+            out.add(new ChessMove(start, end, PieceType.QUEEN));
+            out.add(new ChessMove(start, end, PieceType.ROOK));
+            out.add(new ChessMove(start, end, PieceType.BISHOP));
+            out.add(new ChessMove(start, end, PieceType.KNIGHT));
+        } else {
+            out.add(new ChessMove(start, end, null));
+        }
     }
 
     private boolean inBounds(int r, int c) {
