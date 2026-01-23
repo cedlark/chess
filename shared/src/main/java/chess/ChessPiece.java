@@ -1,7 +1,7 @@
 package chess;
 
 import java.util.Collection;
-import java.util.HastSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Objects;
 
@@ -36,9 +36,7 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-
         return pieceColor;
-
     }
 
     /**
@@ -56,7 +54,12 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Set<ChessMove> moves = new HastSet<>();
+//        ChessPiece piece = board.getPiece(myPosition);
+//        if (piece.getPieceType() == PieceType.BISHOP) {
+//            return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+//        }
+//        return List.of();
+        Set<ChessMove> moves = new HashSet<>();
         switch (type) {
             case KING -> kingMoves(board, myPosition, moves);
             case QUEEN -> queenMoves(board, myPosition, moves);
@@ -68,10 +71,10 @@ public class ChessPiece {
         return moves;
     }
     private void kingMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
-        for (int r = -1; r <=1; r++;) {
-            for (int c = -1; r <= 1; c++;){
-                if (r == 0 && c == 0) continue;
-                tryAdd(board, p, p.getRow() + r, p.getColumn() + c, out, null);
+        for (int dr = -1; dr <=1; dr++) {
+            for (int dc = -1; dc <= 1; dc++) {
+                if (dr == 0 && dc == 0) continue;
+                tryAdd(board, p, p.getRow() + dr, p.getColumn() + dc, out, null);
             }
         }
     }
@@ -95,16 +98,16 @@ public class ChessPiece {
                 {1,0}, {-1,0}, {0,1}, {0,-1}
         });
     }
-    private void queenMoves(ChessBoard board, ChessPiece p, Set <ChessMove> out) {
+    private void queenMoves(ChessBoard board, ChessPosition p, Set <ChessMove> out) {
         bishopMoves(board, p, out);
         rookMoves(board, p, out);
     }
     private void slideMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out, int [][] directions) {
-        for (int dir : directions) {
+        for (int[] dir : directions) {
             int r = p.getRow() + dir[0];
             int c = p.getColumn() + dir[1];
             while (inBounds(r,c)) {
-                ChessPiece target = board.getPeice(new ChessPosition(r,c));
+                ChessPiece target = board.getPiece(new ChessPosition(r,c));
                 if (target == null) {
                     out.add(new ChessMove(p, new ChessPosition(r,c), null));
                 } else {
@@ -120,9 +123,9 @@ public class ChessPiece {
         }
     }
     private void pawnMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out){
-        int dir = (peiceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        int startRow = (peiceColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
-        int promotionRow = (peiceColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        int dir = (pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promotionRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
         int oneStep = p.getRow() + dir;
         int twoStep = oneStep + dir;
@@ -133,7 +136,7 @@ public class ChessPiece {
                 movePawn(p, twoStep, p.getColumn(), promotionRow, out);
             }
         }
-        int sideCol = {p.getColumn() +1,p.getColumn()-1};
+        int[] sideCol = {p.getColumn() +1,p.getColumn()-1};
         for (int col : sideCol){
             if (inBounds(oneStep, col)) continue;
             ChessPiece target = board.getPiece(new ChessPosition(oneStep, col));
@@ -166,14 +169,14 @@ public class ChessPiece {
     private boolean inBounds(int r, int c) {
         return r >= 1 && r <= 8 && c >= 1 && c <= 8;
     }
-
+    @Override
     public boolean equals(Object object) {
         if (object == null || getClass() != object.getClass()) return false;
         if (!super.equals(object)) return false;
         ChessPiece that = (ChessPiece) object;
         return java.util.Objects.equals(pieceColor, that.pieceColor) && type == that.type;
     }
-
+    @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), pieceColor, type);
     }

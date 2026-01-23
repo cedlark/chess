@@ -1,6 +1,7 @@
 package chess;
-import java.utils.Arrays;
+import java.util.Arrays;
 import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,7 +9,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] board = new ChessPiece[8][8];
+    private final ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
         
@@ -22,7 +23,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
 
-        board[position.getRow() -1][position.getColumn() -1] = peice;
+        board[position.getRow() -1][position.getColumn() -1] = piece;
 
     }
 
@@ -44,7 +45,7 @@ public class ChessBoard {
 
     public void resetBoard(){
         for (int r = 0; r < 8; r++) {
-            Array.fill(board[r], null);
+            Arrays.fill(board[r], null);
         }
         placeBackRank(1, ChessGame.TeamColor.WHITE);
         for (int c = 1; c <= 8; c++) {
@@ -67,19 +68,20 @@ public class ChessBoard {
         addPiece(new ChessPosition(row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
     }
-    }
 
-    @OVerride
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        ChessBoard that = (ChessBoard) object;
-        return java.util.Objects.deepEquals(board, that.board) && java.util.Objects.equals(chess_board, that.chess_board);
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), Arrays.deepHashCode(board), chess_board);
+        return Arrays.deepHashCode(board);
     }
-
 }
+
+

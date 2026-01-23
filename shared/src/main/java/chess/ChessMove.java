@@ -7,6 +7,7 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
+
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
@@ -52,10 +53,10 @@ public class ChessMove {
         if (object == null || getClass() != object.getClass()) return false;
         if (!super.equals(object)) return false;
         ChessMove chessMove = (ChessMove) object;
-        return java.util.Objects.equals(getStartPosition(), chessMove.getStartPosition()) && java.util.Objects.equals(getEndPosition(), chessMove.getEndPosition()) && java.util.Objects.equals(promotionPeice, chessMove.promotionPeice);
+        return java.util.Objects.equals(getStartPosition(), chessMove.getStartPosition()) && java.util.Objects.equals(getEndPosition(), chessMove.getEndPosition()) && java.util.Objects.equals(promotionPiece, chessMove.promotionPiece);
     }
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getStartPosition(), getEndPosition(), promotionPeice);
+        return Objects.hash(super.hashCode(), getStartPosition(), getEndPosition(), promotionPiece);
     }
 }
