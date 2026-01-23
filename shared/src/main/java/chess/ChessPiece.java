@@ -122,33 +122,10 @@ public class ChessPiece {
             }
         }
     }
-    private void pawnMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out){
-        int dir = (pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        int startRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
-        int promotionRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
-        int oneStep = p.getRow() + dir;
-        int twoStep = oneStep + dir;
-        if (inBounds(oneStep, p.getColumn()) && board.getPiece(new ChessPosition(oneStep, p.getColumn())) == null) {
-            movePawn(p, oneStep, p.getColumn(), promotionRow, out);
-            if (p.getRow() == startRow && inBounds(twoStep, p.getColumn())
-                    && board.getPiece(new ChessPosition(twoStep, p.getColumn())) == null) {
-                movePawn(p, twoStep, p.getColumn(), promotionRow, out);
-            }
-        }
-        int[] sideCol = {p.getColumn() +1,p.getColumn()-1};
-        for (int col : sideCol){
-            if (inBounds(oneStep, col)) continue;
-            ChessPiece target = board.getPiece(new ChessPosition(oneStep, col));
-            if (target != null && target.getTeamColor() != this.pieceColor) {
-                movePawn(p, oneStep, col, promotionRow, out);
-            }
-        }
-    }
-
-    private void movePawn(ChessPosition start, int endRow, int endCol, int promotionRow, Set<ChessMove> out) {
+    private void addPawnAdvance(ChessPosition start, int endRow, int endCol, int promoRow, Set<ChessMove> out) {
         ChessPosition end = new ChessPosition(endRow, endCol);
-        if (endRow == promotionRow) {
+        if (endRow == promoRow) {
             out.add(new ChessMove(start, end, PieceType.QUEEN));
             out.add(new ChessMove(start, end, PieceType.ROOK));
             out.add(new ChessMove(start, end, PieceType.BISHOP));
@@ -157,6 +134,43 @@ public class ChessPiece {
             out.add(new ChessMove(start, end, null));
         }
     }
+
+
+    private void pawnMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
+        int dir = (pieceColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        int startRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
+        int promoRow = (pieceColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
+
+        int oneRow = p.getRow() + dir;
+
+        // Forward move
+        if (inBounds(oneRow, p.getColumn()) &&
+                board.getPiece(new ChessPosition(oneRow, p.getColumn())) == null) {
+
+            addPawnAdvance(p, oneRow, p.getColumn(), promoRow, out);
+
+            // Double move
+            int twoRow = p.getRow() + 2 * dir;
+            if (p.getRow() == startRow &&
+                    board.getPiece(new ChessPosition(twoRow, p.getColumn())) == null) {
+                out.add(new ChessMove(p, new ChessPosition(twoRow, p.getColumn()), null));
+            }
+        }
+
+        // Diagonal captures (EDGE SAFE)
+        int[] capCols = {p.getColumn() - 1, p.getColumn() + 1};
+        for (int c : capCols) {
+            if (c < 1 || c > 8) continue;
+
+            ChessPosition end = new ChessPosition(oneRow, c);
+            ChessPiece target = board.getPiece(end);
+
+            if (target != null && target.getTeamColor() != pieceColor) {
+                addPawnAdvance(p, oneRow, c, promoRow, out);
+            }
+        }
+    }
+
     private void tryAdd(ChessBoard board, ChessPosition start, int r, int c, Set<ChessMove> out, PieceType promo) {
         if (!inBounds(r, c)) return;
         ChessPosition end = new ChessPosition(r, c);
@@ -170,14 +184,14 @@ public class ChessPiece {
         return r >= 1 && r <= 8 && c >= 1 && c <= 8;
     }
     @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        ChessPiece that = (ChessPiece) object;
-        return java.util.Objects.equals(pieceColor, that.pieceColor) && type == that.type;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChessPiece that)) return false;
+        return pieceColor == that.pieceColor && type == that.type;
     }
+
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), pieceColor, type);
+        return Objects.hash(pieceColor, type);
     }
 }
