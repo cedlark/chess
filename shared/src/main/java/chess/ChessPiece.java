@@ -12,8 +12,8 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor pieceColor;
-    private PieceType type;
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -77,8 +77,8 @@ public class ChessPiece {
     }
 
     private void knightMoves(ChessBoard board, ChessPosition p, Set<ChessMove> out) {
-        for (int r = -2; r<=2; r++;) {
-            for (int c = -2; c<= 2; c++;) {
+        for (int r = -2; r<=2; r++) {
+            for (int c = -2; c<= 2; c++) {
                 if (r*c == -2 | r*c == 2) {
                     tryAdd(board, p, p.getRow() + r, p.getColumn() + c, out, null);
                 }
@@ -109,7 +109,7 @@ public class ChessPiece {
                     out.add(new ChessMove(p, new ChessPosition(r,c), null));
                 } else {
                     if (target.getTeamColor() != this.pieceColor) {
-                        out.add(new ChessMove(p, new ChessPosition(r,c), null))
+                        out.add(new ChessMove(p, new ChessPosition(r,c), null));
                     }
                     break;
                 }
@@ -154,8 +154,27 @@ public class ChessPiece {
             out.add(new ChessMove(start, end, null));
         }
     }
+    private void tryAdd(ChessBoard board, ChessPosition start, int r, int c, Set<ChessMove> out, PieceType promo) {
+        if (!inBounds(r, c)) return;
+        ChessPosition end = new ChessPosition(r, c);
+        ChessPiece target = board.getPiece(end);
+        if (target == null || target.getTeamColor() != this.pieceColor) {
+            out.add(new ChessMove(start, end, promo));
+        }
+    }
 
     private boolean inBounds(int r, int c) {
         return r >= 1 && r <= 8 && c >= 1 && c <= 8;
+    }
+
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        ChessPiece that = (ChessPiece) object;
+        return java.util.Objects.equals(pieceColor, that.pieceColor) && type == that.type;
+    }
+
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), pieceColor, type);
     }
 }
