@@ -54,17 +54,18 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) return null;
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        List<ChessMove> validMoves = new ArrayList<ChessMove>();
+        Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : moves) {
             ChessPiece captured = board.getPiece(move.getEndPosition());
             board.addPiece(move.getEndPosition(), piece);
+            board.addPiece(startPosition, null);
             boolean inCheck = isInCheck(piece.getTeamColor());
+            board.addPiece(startPosition, piece);
             board.addPiece(move.getEndPosition(), captured);
             if (!inCheck) {
                 validMoves.add(move);
             }
         }
-
         return validMoves;
     }
 
@@ -92,10 +93,7 @@ public class ChessGame {
         board.addPiece(end, piece);
         board.addPiece(start, null);
         if (move.getPromotionPiece() != null) {
-            board.addPiece(
-                    end,
-                    new ChessPiece(piece.getTeamColor(), move.getPromotionPiece())
-            );
+            board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
