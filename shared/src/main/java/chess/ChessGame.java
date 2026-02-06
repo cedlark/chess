@@ -102,7 +102,7 @@ public class ChessGame {
                 for (ChessMove move : moves){
                     ChessPosition end = move.getEndPosition();
                     ChessPiece target = board.getPiece(end);
-                    if (target.getPieceType() == ChessPiece.PieceType.KING && target.getTeamColor() == teamColor){
+                    if (target != null && target.getPieceType() == ChessPiece.PieceType.KING && target.getTeamColor() == teamColor){
                         return true;
                     }
                 }
@@ -168,7 +168,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        board.resetBoard();
+        this.board = board;
     }
     /**
      * Gets the current chessboard
