@@ -1,4 +1,5 @@
 package chess;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -9,10 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private final ChessPiece[][] board = new ChessPiece[8][8];
-
+    private ChessPiece[][] board = new ChessPiece[8][8];
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -22,9 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-
         board[position.getRow() -1][position.getColumn() -1] = piece;
-
     }
 
     /**
@@ -42,38 +40,35 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
-
-    public void resetBoard(){
-        for (int r = 0; r < 8; r++) {
+    public void resetBoard() {
+        for (int r = 0; r < 8; r++){
             Arrays.fill(board[r], null);
         }
-        placeBackRank(1, ChessGame.TeamColor.WHITE);
-        for (int c = 1; c <= 8; c++) {
+        addBackRow(1, ChessGame.TeamColor.WHITE);
+        for (int c = 1; c <= 8; c++){
             addPiece(new ChessPosition(2, c), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-        }
-
-        placeBackRank(8, ChessGame.TeamColor.BLACK);
-        for (int c = 1; c <= 8; c++) {
             addPiece(new ChessPosition(7, c), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
-    }
+        addBackRow(8, ChessGame.TeamColor.BLACK);
 
-    private void placeBackRank(int row, ChessGame.TeamColor color) {
-        addPiece(new ChessPosition(row, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
-        addPiece(new ChessPosition(row, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(row, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(row, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
-        addPiece(new ChessPosition(row, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
-        addPiece(new ChessPosition(row, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
-        addPiece(new ChessPosition(row, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
-        addPiece(new ChessPosition(row, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+    }
+    private void addBackRow(int r, ChessGame.TeamColor color) {
+        addPiece(new ChessPosition(r, 1), new ChessPiece(color, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(r, 2), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(r, 3), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(r, 4), new ChessPiece(color, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(r, 5), new ChessPiece(color, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(r, 6), new ChessPiece(color, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(r, 7), new ChessPiece(color, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(r, 8), new ChessPiece(color, ChessPiece.PieceType.ROOK));
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessBoard that)) return false;
-        return Arrays.deepEquals(this.board, that.board);
+        if (!(o instanceof ChessBoard that)) {
+            return false;
+        }
+        return Objects.deepEquals(board, that.board);
     }
 
     @Override
@@ -81,5 +76,3 @@ public class ChessBoard {
         return Arrays.deepHashCode(board);
     }
 }
-
-
