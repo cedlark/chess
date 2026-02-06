@@ -75,13 +75,30 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        Collection<ChessMove> valid = validMoves(move.getStartPosition());
-        if (valid == null || !valid.contains(move)) {
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+
+        ChessPiece piece = board.getPiece(start);
+        if (piece == null) {
             throw new InvalidMoveException();
         }
-        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-        board.addPiece(move.getStartPosition(), null);
+        if (piece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException();
+        }
+        Collection<ChessMove> legalMoves = validMoves(start);
+        if (legalMoves == null || !legalMoves.contains(move)) {
+            throw new InvalidMoveException();
+        }
+        board.addPiece(end, piece);
+        board.addPiece(start, null);
+        if (move.getPromotionPiece() != null) {
+            board.addPiece(
+                    end,
+                    new ChessPiece(piece.getTeamColor(), move.getPromotionPiece())
+            );
+        }
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
     }
 
     /**
@@ -98,7 +115,7 @@ public class ChessGame {
 
                 if (piece == null || piece.getTeamColor() == teamColor) continue;
 
-                Collection<ChessMove> moves = validMoves(cur);
+                Collection<ChessMove> moves =piece.pieceMoves(board, cur);
                 for (ChessMove move : moves){
                     ChessPosition end = move.getEndPosition();
                     ChessPiece target = board.getPiece(end);
