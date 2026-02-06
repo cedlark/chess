@@ -56,7 +56,11 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         List<ChessMove> validMoves = new ArrayList<ChessMove>();
         for (ChessMove move : moves) {
-            if (!isInCheck(teamTurn) | !isInCheckmate(teamTurn)){
+            ChessPiece captured = board.getPiece(move.getEndPosition());
+            board.addPiece(move.getEndPosition(), piece);
+            boolean inCheck = isInCheck(piece.getTeamColor());
+            board.addPiece(move.getEndPosition(), captured);
+            if (!inCheck) {
                 validMoves.add(move);
             }
         }
