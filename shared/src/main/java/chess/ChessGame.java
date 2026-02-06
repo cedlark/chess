@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -51,7 +53,15 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null) return null;
-        return piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        List<ChessMove> validMoves = new ArrayList<ChessMove>();
+        for (ChessMove move : moves) {
+            if (!isInCheck(teamTurn) | !isInCheckmate(teamTurn)){
+                validMoves.add(move);
+            }
+        }
+
+        return validMoves;
     }
 
     /**
@@ -61,7 +71,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition end = move.getEndPosition();
+        ChessPosition start = move.getStartPosition();
+        ChessPiece mover = board.getPiece(start);
+        board.addPiece(end, mover);
     }
 
     /**
@@ -92,7 +105,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return teamColor == teamTurn;
+
     }
 
     /**
