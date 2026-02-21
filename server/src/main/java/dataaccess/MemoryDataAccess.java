@@ -19,13 +19,19 @@ public class MemoryDataAccess {
         games.put(game.getGameId(), game);
         return game;
     }
-    public GameData getGame(Integer gameId){
+    public GameData getGame(Integer gameId) throws DataAccessException {
+        if (game == null) {
+            throw new DataAccessException("Error: invalid game ID");
+        }
         return games.get(gameId);
     }
     public List<GameData> getGames() {
         return new ArrayList<>(games.values());
     }
-    public void updateGame(Integer gameId, GameData game){
+    public void updateGame(Integer gameId, GameData game) throws DataAccessException {
+        if (!games.containsKey(gameId)) {
+            throw new DataAccessException("Error: invalid game ID");
+        }
         game = new GameData(nextId++, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
         games.replace(gameId, game);
     }
@@ -36,10 +42,17 @@ public class MemoryDataAccess {
         authTokens.put(token, auth);
         return auth;
     }
-    public AuthData getAuth(String authToken){
-        return authTokens.get(authToken);
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        AuthData auth = authTokens.get(authToken);
+        if (auth == null) {
+            throw new DataAccessException("Error: invalid auth token");
+        }
+        return auth;
     }
-    public void deleteAuth(String authToken){
+    public void deleteAuth(String authToken) throws DataAccessException {
+        if (!authTokens.containsKey(authToken)) {
+            throw new DataAccessException("Error: invalid auth token");
+        }
         authTokens.remove(authToken);
     }
     public UserData addUser(UserData user){
@@ -47,8 +60,12 @@ public class MemoryDataAccess {
         users.put(user.getUsername(), user);
         return user;
     }
-    public UserData getUser(String username){
-        return users.get(username);
+    public UserData getUser(String username) throws DataAccessException {
+        UserData user = users.get(username);
+        if (user == null) {
+            throw new DataAccessException("Error: user not found");
+        }
+        return user;
     }
 
     public void clearAll(){
