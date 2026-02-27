@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.*;
-import org.eclipse.jetty.server.Authentication;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,10 +13,10 @@ public class MemoryDataAccess {
     final private HashMap<Integer, GameData> games = new HashMap<>();
     final private HashMap<String, UserData> users = new HashMap<>();
 
-    public GameData addGame(GameData game){
+    public int addGame(GameData game){
         game = new GameData(nextId++, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
         games.put(game.getGameId(), game);
-        return game;
+        return game.getGameId();
     }
     public GameData getGame(Integer gameId) throws DataAccessException {
         if (gameId == null) {
