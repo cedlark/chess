@@ -3,6 +3,8 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
 
+import javax.xml.crypto.Data;
+
 public class UserService {
     private final MemoryDataAccess dao;
 
@@ -28,10 +30,29 @@ public class UserService {
         return new RegisterResult(username, token);
 
     }
-    public LoginResult login(LoginRequest loginRequest) {
-
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        String username = loginRequest.username();
+        String password = loginRequest.password();
+        if (username == null || password == null ||
+            username.isBlank() || password.isBlank()){
+            throw new DataAccessException("Error: Bad request");
+        }
+        if (dao.getUser(username) == null){
+            throw new DataAccessException("Error: User doesn't exist");
+        }
+        String token = MemoryDataAccess.generateToken();
+        AuthData auth = new AuthData(token, username);
+        dao.addAuth(auth);
+        return new LoginResult(username, token);
     }
-    public void logout(LogoutRequest logoutRequest) {
-
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException {
+        String token = logoutRequest.authToken();
+        if (token == null || token.isBlank()){
+            throw new DataAccessException("Error: Bad request");
+        }
+        if (dao.getAuth(token) == null){
+            throw new DataAccessException("Error: Wrong token");
+        }
+        dao.deleteAuth(token);
     }
 }
