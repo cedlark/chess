@@ -20,7 +20,7 @@ public class MemoryDataAccess {
         return game;
     }
     public GameData getGame(Integer gameId) throws DataAccessException {
-        if (game == null) {
+        if (gameId == null) {
             throw new DataAccessException("Error: invalid game ID");
         }
         return games.get(gameId);
