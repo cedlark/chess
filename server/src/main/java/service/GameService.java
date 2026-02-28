@@ -7,7 +7,7 @@ import model.*;
 public class GameService {
     private final MemoryDataAccess dao;
 
-    GameService(MemoryDataAccess dao){
+    public GameService(MemoryDataAccess dao){
         this.dao = dao;
     }
     public GamesResult listGames(GamesRequest request) throws DataAccessException {
