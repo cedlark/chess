@@ -2,12 +2,10 @@ package server;
 
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
-import com.google.gson.Gson;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 
-import java.util.Map;
 public class Server {
 
     private final Javalin javalin;

@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.*;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 
 public class LoginHandler {
@@ -23,8 +22,8 @@ public class LoginHandler {
             ctx.json(result);
         } catch (DataAccessException e){
             switch (e.getMessage()){
-                case "Error: already taken" -> ctx.status(403);
                 case "Error: bad request" -> ctx.status(400);
+                case "Error: unauthorized" -> ctx.status(401);
                 default -> ctx.status(500);
             }
             ctx.json(Map.of("message", e.getMessage()));

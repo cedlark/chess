@@ -7,24 +7,24 @@ import service.*;
 
 import java.util.Map;
 
-public class CreateGameHandler {
+public class ListGamesHandler {
     private final GameService gameService;
     private final Gson gson = new Gson();
 
-    public CreateGameHandler(GameService gameService){
+    public ListGamesHandler(GameService gameService){
         this.gameService = gameService;
     }
     public void handle(Context ctx){
         try {
-            MakeGameRequest request = gson.fromJson(ctx.body(), MakeGameRequest.class);
-            MakeGameResult result = gameService.createGame(request);
+            GamesRequest request = gson.fromJson(ctx.body(), GamesRequest.class);
+            GamesResult result = gameService.listGames(request);
             ctx.status(200);
             ctx.json(result);
         } catch (DataAccessException e){
-            switch (e.getMessage()){
-                case "Error: bad request" -> ctx.status(400);
-                case "Error: unauthorized" -> ctx.status(401);
-                default -> ctx.status(500);
+            if (e.getMessage().equals("Error: unauthorized")) {
+                ctx.status(401);
+            } else {
+                ctx.status(500);
             }
             ctx.json(Map.of("message", e.getMessage()));
         }
