@@ -23,11 +23,7 @@ public class ClearHandler {
             ctx.status(200);
             ctx.json(Map.of());
         } catch (DataAccessException e){
-            switch (e.getMessage()){
-                case "Error: already taken" -> ctx.status(403);
-                case "Error: bad request" -> ctx.status(400);
-                default -> ctx.status(500);
-            }
+            ctx.status(500);
             ctx.json(Map.of("message", e.getMessage()));
         }
     }
