@@ -137,7 +137,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)){
+            return false;
+        }
 
         for (int row = 1; row <= 8; row++){
             for (int col = 1; col <= 8; col++){
@@ -165,7 +167,9 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) return false;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
 
         for (int row = 1; row <= 8; row++){
             for (int col = 1; col <= 8; col++){
