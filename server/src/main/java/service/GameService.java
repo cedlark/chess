@@ -19,7 +19,7 @@ public class GameService {
     }
     public MakeGameResult createGame(MakeGameRequest request) throws DataAccessException {
         String token = request.token();
-        String gameName = request.GameName();
+        String gameName = request.gameName();
         if (dao.getAuth(token) == null){
             throw new DataAccessException("Error: unauthorized");
         }
