@@ -16,7 +16,8 @@ public class LogoutHandler {
     }
     public void handle(Context ctx){
         try {
-            LogoutRequest request = gson.fromJson(ctx.body(), LogoutRequest.class);
+            String token = ctx.header("authorization");
+            LogoutRequest request = new LogoutRequest(token);
             userService.logout(request);
             ctx.status(200);
             ctx.json(Map.of());

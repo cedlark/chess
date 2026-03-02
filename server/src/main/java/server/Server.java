@@ -1,7 +1,9 @@
 package server;
 
+import com.google.gson.Gson;
 import dataaccess.MemoryDataAccess;
 import io.javalin.*;
+import io.javalin.json.JavalinGson;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -11,7 +13,10 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson(new Gson(), false));
+        });
         MemoryDataAccess dao = new MemoryDataAccess();
         UserService userService = new UserService(dao);
         GameService gameService = new GameService(dao);

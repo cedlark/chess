@@ -17,10 +17,10 @@ public class UserService {
         String email = registerRequest.email();
         if (username == null || password == null || email == null ||
                 username.isBlank() || password.isBlank() || email.isBlank()){
-            throw new DataAccessException("Error: Bad request");
+            throw new DataAccessException("Error: bad request");
         }
         if (dao.getUser(username) != null){
-            throw new DataAccessException("Error: Already Taken");
+            throw new DataAccessException("Error: already taken");
         }
         UserData newUser = new UserData(username, password, email);
         dao.addUser(newUser);
@@ -35,10 +35,14 @@ public class UserService {
         String password = loginRequest.password();
         if (username == null || password == null ||
             username.isBlank() || password.isBlank()){
-            throw new DataAccessException("Error: Bad request");
+            throw new DataAccessException("Error: bad request");
         }
         if (dao.getUser(username) == null){
-            throw new DataAccessException("Error: User doesn't exist");
+            throw new DataAccessException("Error: unauthorized");
+        }
+        UserData user = dao.getUser(username);
+        if (!user.getPassword().equals(password)) {
+            throw new DataAccessException("Error: unauthorized");
         }
         String token = MemoryDataAccess.generateToken();
         AuthData auth = new AuthData(token, username);
@@ -48,10 +52,10 @@ public class UserService {
     public void logout(LogoutRequest logoutRequest) throws DataAccessException {
         String token = logoutRequest.authToken();
         if (token == null || token.isBlank()){
-            throw new DataAccessException("Error: Bad request");
+            throw new DataAccessException("Error: bad request");
         }
         if (dao.getAuth(token) == null){
-            throw new DataAccessException("Error: Wrong token");
+            throw new DataAccessException("Error: unauthorized");
         }
         dao.deleteAuth(token);
     }

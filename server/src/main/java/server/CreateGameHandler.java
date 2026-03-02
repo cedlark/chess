@@ -16,10 +16,12 @@ public class CreateGameHandler {
     }
     public void handle(Context ctx){
         try {
-            MakeGameRequest request = gson.fromJson(ctx.body(), MakeGameRequest.class);
-            MakeGameResult result = gameService.createGame(request);
-            ctx.status(200);
-            ctx.json(result);
+            String token = ctx.header("authorization");
+            var body = gson.fromJson(ctx.body(), Map.class);
+            String gameName = (String) body.get("gameName");
+            MakeGameRequest req = new MakeGameRequest(token, gameName);
+            MakeGameResult res = gameService.createGame(req);
+            ctx.status(200).json(res);
         } catch (DataAccessException e){
             switch (e.getMessage()){
                 case "Error: bad request" -> ctx.status(400);

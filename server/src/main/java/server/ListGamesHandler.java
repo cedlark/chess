@@ -16,7 +16,8 @@ public class ListGamesHandler {
     }
     public void handle(Context ctx){
         try {
-            GamesRequest request = gson.fromJson(ctx.body(), GamesRequest.class);
+            String token = ctx.header("authorization");
+            GamesRequest request = new GamesRequest(token);
             GamesResult result = gameService.listGames(request);
             ctx.status(200);
             ctx.json(result);

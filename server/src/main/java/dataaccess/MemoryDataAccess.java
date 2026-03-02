@@ -31,22 +31,19 @@ public class MemoryDataAccess {
         if (!games.containsKey(gameId)) {
             throw new DataAccessException("Error: invalid game ID");
         }
-        game = new GameData(nextId++, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
-        games.replace(gameId, game);
+        GameData updated = new GameData(gameId, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
+        games.put(gameId, updated);
     }
 
-    public AuthData addAuth(AuthData auth){
-        String token = generateToken();
-        auth = new AuthData(token, auth.getUsername());
-        authTokens.put(token, auth);
+    public AuthData addAuth(AuthData auth) throws DataAccessException {
+        if (auth == null || auth.getAuthToken() == null || auth.getAuthToken().isBlank()) {
+            throw new DataAccessException("Error: bad request");
+        }
+        authTokens.put(auth.getAuthToken(), auth);
         return auth;
     }
     public AuthData getAuth(String authToken) throws DataAccessException {
-        AuthData auth = authTokens.get(authToken);
-        if (auth == null) {
-            throw new DataAccessException("Error: invalid auth token");
-        }
-        return auth;
+        return authTokens.get(authToken);
     }
     public void deleteAuth(String authToken) throws DataAccessException {
         if (!authTokens.containsKey(authToken)) {
@@ -60,11 +57,7 @@ public class MemoryDataAccess {
         return user;
     }
     public UserData getUser(String username) throws DataAccessException {
-        UserData user = users.get(username);
-        if (user == null) {
-            throw new DataAccessException("Error: user not found");
-        }
-        return user;
+        return users.get(username);
     }
 
     public void clearAll(){
