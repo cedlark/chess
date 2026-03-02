@@ -22,12 +22,7 @@ public class LogoutHandler {
             ctx.status(200);
             ctx.json(Map.of());
         } catch (DataAccessException e){
-            if (e.getMessage().equals("Error: unauthorized")) {
-                ctx.status(401);
-            } else {
-                ctx.status(500);
-            }
-            ctx.json(Map.of("message", e.getMessage()));
+            ErrorHandler.handle(ctx, e);
         }
     }
 }

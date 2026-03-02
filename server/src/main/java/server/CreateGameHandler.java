@@ -23,12 +23,7 @@ public class CreateGameHandler {
             MakeGameResult res = gameService.createGame(req);
             ctx.status(200).json(res);
         } catch (DataAccessException e){
-            switch (e.getMessage()){
-                case "Error: bad request" -> ctx.status(400);
-                case "Error: unauthorized" -> ctx.status(401);
-                default -> ctx.status(500);
-            }
-            ctx.json(Map.of("message", e.getMessage()));
+            ErrorHandler.handle(ctx, e);
         }
     }
 }

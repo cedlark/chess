@@ -129,6 +129,24 @@ public class ChessGame {
         }
         return false;
     }
+    private boolean canMove(TeamColor teamColor) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition cur = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(cur);
+
+                if (piece == null || piece.getTeamColor() != teamColor) {
+                    continue;
+                }
+
+                Collection<ChessMove> moves = validMoves(cur);
+                if (!moves.isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * Determines if the given team is in checkmate
@@ -140,23 +158,7 @@ public class ChessGame {
         if (!isInCheck(teamColor)){
             return false;
         }
-
-        for (int row = 1; row <= 8; row++){
-            for (int col = 1; col <= 8; col++){
-                ChessPosition cur = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(cur);
-
-                if (piece == null || piece.getTeamColor() != teamColor){
-                    continue;
-                }
-
-                Collection<ChessMove> moves = validMoves(cur);
-                if (!moves.isEmpty()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return !canMove(teamColor);
     }
 
     /**
@@ -171,22 +173,7 @@ public class ChessGame {
             return false;
         }
 
-        for (int row = 1; row <= 8; row++){
-            for (int col = 1; col <= 8; col++){
-                ChessPosition cur = new ChessPosition(row, col);
-                ChessPiece piece = board.getPiece(cur);
-
-                if (piece == null || piece.getTeamColor() != teamColor){
-                    continue;
-                }
-
-                Collection<ChessMove> moves = validMoves(cur);
-                if (!moves.isEmpty()) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return !canMove(teamColor);
     }
 
     /**
