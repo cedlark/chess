@@ -37,10 +37,14 @@ public class PawnMoves {
         int row = pos.getRow() + direction;
         int col = pos.getColumn();
 
-        if (!inBounds(row, col)) return;
+        if (!inBounds(row, col)){
+            return;
+        }
 
         ChessPosition oneStep = new ChessPosition(row, col);
-        if (board.getPiece(oneStep) != null) return;
+        if (board.getPiece(oneStep) != null){
+            return;
+        }
 
         if (row == promotionRow) {
             addPromotions(pos, oneStep, moves);
@@ -67,12 +71,16 @@ public class PawnMoves {
             int col,
             int promotionRow) {
 
-        if (!inBounds(row, col)) return;
+        if (!inBounds(row, col)){
+            return;
+        }
 
         ChessPosition targetPos = new ChessPosition(row, col);
         ChessPiece target = board.getPiece(targetPos);
 
-        if (target == null || target.getTeamColor() == color) return;
+        if (target == null || target.getTeamColor() == color){
+            return;
+        }
 
         if (row == promotionRow) {
             addPromotions(pos, targetPos, moves);
