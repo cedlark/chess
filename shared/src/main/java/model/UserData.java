@@ -30,7 +30,9 @@ public class UserData {
         if (!(o instanceof UserData userData)) {
             return false;
         }
-        return Objects.equals(getUsername(), userData.getUsername()) && Objects.equals(getPassword(), userData.getPassword()) && Objects.equals(getEmail(), userData.getEmail());
+        return Objects.equals(getUsername(), userData.getUsername()) &&
+                Objects.equals(getPassword(), userData.getPassword()) &&
+                Objects.equals(getEmail(), userData.getEmail());
     }
 
     @Override

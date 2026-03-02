@@ -13,11 +13,11 @@ public class KnightMoves {
                 {1,2}, {1,-2}, {2,1}, {2,-1},{-1,2}, {-1,-2}, {-2,1}, {-2,-1}
         };
         for (int[] dir : directions){
-            int new_r = myPosition.getRow() + dir[0];
-            int new_c = myPosition.getColumn() + dir[1];
+            int newR = myPosition.getRow() + dir[0];
+            int newC = myPosition.getColumn() + dir[1];
 
-            if (inBounds(new_r, new_c)){
-                ChessPosition end = new ChessPosition(new_r, new_c);
+            if (inBounds(newR, newC)){
+                ChessPosition end = new ChessPosition(newR, newC);
                 ChessPiece target = board.getPiece(end);
                 if (target == null){
                     moves.add(new ChessMove(myPosition, end, null));

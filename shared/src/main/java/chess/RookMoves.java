@@ -13,11 +13,11 @@ public class RookMoves {
                 {1,0}, {-1,0}, {0,1}, {0,-1}
         };
         for (int[] dir : directions){
-            int new_r = myPosition.getRow() + dir[0];
-            int new_c = myPosition.getColumn() + dir[1];
+            int newR = myPosition.getRow() + dir[0];
+            int newC = myPosition.getColumn() + dir[1];
 
-            while (inBounds(new_r, new_c)){
-                ChessPosition end = new ChessPosition(new_r, new_c);
+            while (inBounds(newR, newC)){
+                ChessPosition end = new ChessPosition(newR, newC);
                 ChessPiece target = board.getPiece(end);
                 if (target == null){
                     moves.add(new ChessMove(myPosition, end, null));
@@ -28,8 +28,8 @@ public class RookMoves {
                     }
                     break;
                 }
-                new_r += dir[0];
-                new_c += dir[1];
+                newR += dir[0];
+                newC += dir[1];
             }
 
 

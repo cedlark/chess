@@ -53,7 +53,9 @@ public class ChessMove {
         if (!(o instanceof ChessMove chessMove)) {
             return false;
         }
-        return Objects.equals(getStartPosition(), chessMove.getStartPosition()) && Objects.equals(getEndPosition(), chessMove.getEndPosition()) && getPromotionPiece() == chessMove.getPromotionPiece();
+        return Objects.equals(getStartPosition(), chessMove.getStartPosition()) &&
+                Objects.equals(getEndPosition(), chessMove.getEndPosition()) &&
+                getPromotionPiece() == chessMove.getPromotionPiece();
     }
 
     @Override

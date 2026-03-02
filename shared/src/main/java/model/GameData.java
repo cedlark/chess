@@ -38,7 +38,10 @@ public class GameData {
         if (!(o instanceof GameData gameData)) {
             return false;
         }
-        return getGameId() == gameData.getGameId() && Objects.equals(getWhiteUsername(), gameData.getWhiteUsername()) && Objects.equals(getBlackUsername(), gameData.getBlackUsername()) && Objects.equals(getGameName(), gameData.getGameName()) && Objects.equals(getGame(), gameData.getGame());
+        return getGameId() == gameData.getGameId()
+                && Objects.equals(getWhiteUsername(), gameData.getWhiteUsername())
+                && Objects.equals(getBlackUsername(), gameData.getBlackUsername())
+                && Objects.equals(getGameName(), gameData.getGameName()) && Objects.equals(getGame(), gameData.getGame());
     }
 
     @Override

@@ -52,7 +52,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null) return null;
+        if (piece == null) {
+            return null;
+        }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : moves) {
@@ -111,7 +113,9 @@ public class ChessGame {
                 ChessPosition cur = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(cur);
 
-                if (piece == null || piece.getTeamColor() == teamColor) continue;
+                if (piece == null || piece.getTeamColor() == teamColor){
+                    continue;
+                }
 
                 Collection<ChessMove> moves =piece.pieceMoves(board, cur);
                 for (ChessMove move : moves){
@@ -140,7 +144,9 @@ public class ChessGame {
                 ChessPosition cur = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(cur);
 
-                if (piece == null || piece.getTeamColor() != teamColor) continue;
+                if (piece == null || piece.getTeamColor() != teamColor){
+                    continue;
+                }
 
                 Collection<ChessMove> moves = validMoves(cur);
                 if (!moves.isEmpty()) {
@@ -166,7 +172,9 @@ public class ChessGame {
                 ChessPosition cur = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(cur);
 
-                if (piece == null || piece.getTeamColor() != teamColor) continue;
+                if (piece == null || piece.getTeamColor() != teamColor){
+                    continue;
+                }
 
                 Collection<ChessMove> moves = validMoves(cur);
                 if (!moves.isEmpty()) {
