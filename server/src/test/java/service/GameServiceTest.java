@@ -34,7 +34,7 @@ public class GameServiceTest {
                 gameService.createGame(
                         new MakeGameRequest(user.authToken(), "Game"));
 
-        assertTrue(result.gameId() > 0);
+        assertTrue(result.gameID() > 0);
     }
 
     @Test
@@ -97,7 +97,7 @@ public class GameServiceTest {
 
         int gameID = gameService
                 .createGame(new MakeGameRequest(user.authToken(), "Game"))
-                .gameId();
+                .gameID();
 
         JoinRequest request =
                 new JoinRequest(user.authToken(),
@@ -134,7 +134,7 @@ public class GameServiceTest {
 
         int gameID = gameService
                 .createGame(new MakeGameRequest(user1.authToken(), "Game"))
-                .gameId();
+                .gameID();
 
         gameService.joinGame(
                 new JoinRequest(user1.authToken(),
@@ -157,7 +157,7 @@ public class GameServiceTest {
 
         int gameID = gameService
                 .createGame(new MakeGameRequest(user.authToken(), "Game"))
-                .gameId();
+                .gameID();
 
         JoinRequest request =
                 new JoinRequest(user.authToken(),

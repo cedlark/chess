@@ -27,8 +27,8 @@ public class GameService {
             throw new DataAccessException("Error: bad request");
         }
         GameData newGame = new GameData(0,null, null, gameName, new ChessGame());
-        Integer gameId = dao.addGame(newGame);
-        return new MakeGameResult(gameId);
+        Integer gameID = dao.addGame(newGame);
+        return new MakeGameResult(gameID);
     }
     public void joinGame(JoinRequest request) throws DataAccessException {
         String token = request.authToken();

@@ -20,7 +20,7 @@ public class MemoryDataAccess {
     }
     public GameData getGame(Integer gameId) throws DataAccessException {
         if (gameId == null) {
-            throw new DataAccessException("Error: invalid game ID");
+            throw new DataAccessException("Error: bad request");
         }
         return games.get(gameId);
     }
@@ -29,7 +29,7 @@ public class MemoryDataAccess {
     }
     public void updateGame(Integer gameId, GameData game) throws DataAccessException {
         if (!games.containsKey(gameId)) {
-            throw new DataAccessException("Error: invalid game ID");
+            throw new DataAccessException("Error: bad request");
         }
         GameData updated = new GameData(gameId, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
         games.put(gameId, updated);
