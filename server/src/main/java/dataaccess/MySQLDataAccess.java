@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,19 +15,60 @@ public class MySQLDataAccess {
     public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
-    public int addGame(GameData game){
-        game = new GameData(nextId++, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
-        games.put(game.getGameId(), game);
+    public int addGame(GameData game) throws DataAccessException {
+        String statement = "INSERT INTO game (gameID, whiteUsername,blackUsername,gameName, game) VALUES (?,?,?,?,?)";
+
+        executeUpdate(statement,
+                game.getGameId(),
+                game.getWhiteUsername(),
+                game.getBlackUsername(),
+                game.getGameName(),
+                game.getGame());
         return game.getGameId();
     }
-    public GameData getGame(Integer gameId) throws DataAccessException {
-        if (gameId == null) {
-            throw new DataAccessException("Error: bad request");
+    public GameData getGame(Integer gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT gameID, whiteUsername,blackUsername,gameName, game FROM game WHERE gameID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, String.valueOf(gameID));
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new GameData(rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                rs.getObject("game"));
+                    }
+                }
+            }
         }
-        return games.get(gameId);
+        catch (Exception e) {
+            throw new DataAccessException("Error reading auth");
+        }
+        return null;
     }
-    public List<GameData> getGames() {
-        return new ArrayList<>(games.values());
+    public List<GameData> getGames() throws DataAccessException {
+        List<GameData> games = new ArrayList<>();
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM game";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        ChessGame game = new Gson().fromJson(rs.getString("game"),ChessGame.class);
+                        games.add(new GameData(rs.getInt("GameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                game));
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            throw new DataAccessException("Error getting games");
+        }
+        return games;
     }
     public void updateGame(Integer gameId, GameData game) throws DataAccessException {
         if (!games.containsKey(gameId)) {
@@ -47,7 +90,7 @@ public class MySQLDataAccess {
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
+                ps.setString(1, authToken);
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -59,12 +102,19 @@ public class MySQLDataAccess {
         catch (Exception e) {
             throw new DataAccessException("Error reading auth");
         }
+        return null;
     }
     public void deleteAuth(String authToken) throws DataAccessException {
-        if (!authTokens.containsKey(authToken)) {
-            throw new DataAccessException("Error: invalid auth token");
+        try (Connection conn = DatabaseManager.getConnection()){
+            var statement = "DELETE  FROM auth WHERE authToken = ?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                ResultSet rs = ps.executeQuery();
+            }
         }
-        authTokens.remove(authToken);
+        catch (Exception e) {
+            throw new DataAccessException("Error deleting auth");
+        }
     }
     public UserData addUser(UserData user) throws DataAccessException {
         String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
@@ -90,10 +140,13 @@ public class MySQLDataAccess {
         return null;
     }
 
-    public void clearAll(){
-        authTokens.clear();
-        games.clear();
-        users.clear();
+    public void clearAll() throws DataAccessException {
+        var statement = "TRUNCATE auth";
+        executeUpdate(statement);
+        statement = "TRUNCATE games";
+        executeUpdate(statement);
+        statement = "TRUNCATE users";
+        executeUpdate(statement);
     }
 
 
