@@ -1,13 +1,14 @@
 package service;
 import chess.ChessGame;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
 
 public class GameService {
-    private final MemoryDataAccess dao;
+    private final DataAccess dao;
 
-    public GameService(MemoryDataAccess dao){
+    public GameService(DataAccess dao){
         this.dao = dao;
     }
     public GamesResult listGames(GamesRequest request) throws DataAccessException {

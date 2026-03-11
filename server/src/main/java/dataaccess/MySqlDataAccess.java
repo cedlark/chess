@@ -3,6 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         catch (Exception e) {
-            throw new DataAccessException("Error reading auth");
+            throw new DataAccessException("Error reading game");
         }
         return null;
     }
@@ -123,7 +125,8 @@ public class MySqlDataAccess implements DataAccess{
     }
     public UserData addUser(UserData user) throws DataAccessException {
         String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.getUsername(), user.getPassword(), user.getEmail());
+        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        executeUpdate(statement, user.getUsername(), hashed, user.getEmail());
         return user;
     }
     public UserData getUser(String username) throws DataAccessException {

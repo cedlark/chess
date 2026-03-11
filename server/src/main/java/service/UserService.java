@@ -1,14 +1,17 @@
 package service;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
+import java.util.UUID;
 
 public class UserService {
-    private final MemoryDataAccess dao;
+    private final DataAccess dao;
 
-    public UserService(MemoryDataAccess dao){
+    public UserService(DataAccess dao){
         this.dao = dao;
     }
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
@@ -24,7 +27,7 @@ public class UserService {
         }
         UserData newUser = new UserData(username, password, email);
         dao.addUser(newUser);
-        String token = MemoryDataAccess.generateToken();
+        String token = UUID.randomUUID().toString();
         AuthData auth = new AuthData(token, username);
         dao.addAuth(auth);
         return new RegisterResult(username, token);
@@ -41,7 +44,7 @@ public class UserService {
             throw new DataAccessException("Error: unauthorized");
         }
         UserData user = dao.getUser(username);
-        if (!user.getPassword().equals(password)) {
+        if (!BCrypt.checkpw(password, user.getPassword())) {
             throw new DataAccessException("Error: unauthorized");
         }
         String token = MemoryDataAccess.generateToken();

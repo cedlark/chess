@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class MemoryDataAccess {
+public class MemoryDataAccess implements DataAccess {
     private int nextId = 1;
     final private HashMap<String, AuthData> authTokens = new HashMap<>();
     final private HashMap<Integer, GameData> games = new HashMap<>();
