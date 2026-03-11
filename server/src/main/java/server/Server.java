@@ -1,7 +1,10 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
 import service.ClearService;
@@ -12,12 +15,12 @@ public class Server {
 
     private final Javalin javalin;
 
-    public Server() {
+    public Server() throws DataAccessException {
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson(new Gson(), false));
         });
-        MemoryDataAccess dao = new MemoryDataAccess();
+        DataAccess dao = new MySqlDataAccess();
         UserService userService = new UserService(dao);
         GameService gameService = new GameService(dao);
         ClearService clearService = new ClearService(dao);

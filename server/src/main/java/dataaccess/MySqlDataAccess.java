@@ -11,19 +11,18 @@ import java.util.UUID;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class MySQLDataAccess {
+public class MySqlDataAccess implements DataAccess{
     public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
     public int addGame(GameData game) throws DataAccessException {
-        String statement = "INSERT INTO game (gameID, whiteUsername,blackUsername,gameName, game) VALUES (?,?,?,?,?)";
-
+        String statement = "INSERT INTO game (whiteUsername,blackUsername,gameName, game) VALUES (?,?,?,?,?)";
+        String json = new Gson().toJson(game.getGame());
         executeUpdate(statement,
-                game.getGameId(),
                 game.getWhiteUsername(),
                 game.getBlackUsername(),
                 game.getGameName(),
-                game.getGame());
+                json);
         return game.getGameId();
     }
     public GameData getGame(Integer gameID) throws DataAccessException {
@@ -34,11 +33,12 @@ public class MySQLDataAccess {
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        ChessGame game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
                         return new GameData(rs.getInt("gameID"),
                                 rs.getString("whiteUsername"),
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
-                                rs.getObject("game"));
+                                game);
                     }
                 }
             }
@@ -56,7 +56,7 @@ public class MySQLDataAccess {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         ChessGame game = new Gson().fromJson(rs.getString("game"),ChessGame.class);
-                        games.add(new GameData(rs.getInt("GameID"),
+                        games.add(new GameData(rs.getInt("gameID"),
                                 rs.getString("whiteUsername"),
                                 rs.getString("blackUsername"),
                                 rs.getString("gameName"),
@@ -71,11 +71,16 @@ public class MySQLDataAccess {
         return games;
     }
     public void updateGame(Integer gameId, GameData game) throws DataAccessException {
-        if (!games.containsKey(gameId)) {
-            throw new DataAccessException("Error: bad request");
-        }
-        GameData updated = new GameData(gameId, game.getWhiteUsername(), game.getBlackUsername(), game.getGameName(), game.getGame());
-        games.put(gameId, updated);
+        String json = new Gson().toJson(game.getGame());
+        String statement = """
+                UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?
+                """;
+        executeUpdate(statement,
+                game.getWhiteUsername(),
+                game.getBlackUsername(),
+                game.getGameName(),
+                json,
+                gameId);
     }
 
     public AuthData addAuth(AuthData auth) throws DataAccessException {
@@ -86,7 +91,7 @@ public class MySQLDataAccess {
                 auth.getUsername());
         return auth;
     }
-    public AuthData getAuth(String authToken) throws DataAccessException, SQLException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
             var statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -109,7 +114,7 @@ public class MySQLDataAccess {
             var statement = "DELETE  FROM auth WHERE authToken = ?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
-                ResultSet rs = ps.executeQuery();
+                ps.executeUpdate();
             }
         }
         catch (Exception e) {
@@ -141,12 +146,9 @@ public class MySQLDataAccess {
     }
 
     public void clearAll() throws DataAccessException {
-        var statement = "TRUNCATE auth";
-        executeUpdate(statement);
-        statement = "TRUNCATE games";
-        executeUpdate(statement);
-        statement = "TRUNCATE users";
-        executeUpdate(statement);
+        executeUpdate("TRUNCATE auth");
+        executeUpdate("TRUNCATE game");
+        executeUpdate("TRUNCATE user");
     }
 
 
@@ -162,7 +164,6 @@ public class MySQLDataAccess {
                     switch (param) {
                         case String p -> ps.setString(i + 1, p);
                         case Integer p -> ps.setInt(i + 1, p);
-                        case PetType p -> ps.setString(i + 1, p.toString());
                         case null -> ps.setNull(i + 1, NULL);
                         default -> {
                         }
