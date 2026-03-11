@@ -25,7 +25,8 @@ public class UserService {
         if (dao.getUser(username) != null){
             throw new DataAccessException("Error: already taken");
         }
-        UserData newUser = new UserData(username, password, email);
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+        UserData newUser = new UserData(username, hashed, email);
         dao.addUser(newUser);
         String token = UUID.randomUUID().toString();
         AuthData auth = new AuthData(token, username);

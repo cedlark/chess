@@ -18,14 +18,24 @@ public class MySqlDataAccess implements DataAccess{
         configureDatabase();
     }
     public int addGame(GameData game) throws DataAccessException {
-        String statement = "INSERT INTO game (whiteUsername,blackUsername,gameName, game) VALUES (?,?,?,?,?)";
+        String statement = "INSERT INTO game (whiteUsername,blackUsername,gameName, game) VALUES (?,?,?,?)";
         String json = new Gson().toJson(game.getGame());
-        executeUpdate(statement,
-                game.getWhiteUsername(),
-                game.getBlackUsername(),
-                game.getGameName(),
-                json);
-        return game.getGameId();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            PreparedStatement ps =
+                    conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, game.getWhiteUsername());
+            ps.setString(2, game.getBlackUsername());
+            ps.setString(3, game.getGameName());
+            ps.setString(4, json);
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            throw new DataAccessException("Error: failed to get game id");
+        } catch (Exception e) {
+            throw new DataAccessException("Error: unable to add game");
+        }
     }
     public GameData getGame(Integer gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()){
@@ -46,7 +56,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         catch (Exception e) {
-            throw new DataAccessException("Error reading game");
+            throw new DataAccessException("Error: unable to find game");
         }
         return null;
     }
@@ -68,7 +78,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         catch (Exception e) {
-            throw new DataAccessException("Error getting games");
+            throw new DataAccessException("Error: unable to list games");
         }
         return games;
     }
@@ -107,7 +117,7 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         catch (Exception e) {
-            throw new DataAccessException("Error reading auth");
+            throw new DataAccessException("Error: unable to get auth");
         }
         return null;
     }
@@ -120,13 +130,12 @@ public class MySqlDataAccess implements DataAccess{
             }
         }
         catch (Exception e) {
-            throw new DataAccessException("Error deleting auth");
+            throw new DataAccessException("Error: unable to delete auth");
         }
     }
     public UserData addUser(UserData user) throws DataAccessException {
         String statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        String hashed = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-        executeUpdate(statement, user.getUsername(), hashed, user.getEmail());
+        executeUpdate(statement, user.getUsername(), user.getPassword(), user.getEmail());
         return user;
     }
     public UserData getUser(String username) throws DataAccessException {
@@ -142,16 +151,20 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error reading user");
+            throw new DataAccessException("Error: unable to get user");
         }
 
         return null;
     }
 
     public void clearAll() throws DataAccessException {
-        executeUpdate("TRUNCATE auth");
-        executeUpdate("TRUNCATE game");
-        executeUpdate("TRUNCATE user");
+        try {
+            executeUpdate("TRUNCATE auth");
+            executeUpdate("TRUNCATE game");
+            executeUpdate("TRUNCATE user");
+        } catch (Exception e) {
+            throw new DataAccessException("Error: unable to clear all");
+        }
     }
 
 
@@ -181,7 +194,7 @@ public class MySqlDataAccess implements DataAccess{
 
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error executing update");
+            throw new DataAccessException("Error: unable to execute update");
         }
     }
     private final String[] createStatements = {
@@ -222,7 +235,7 @@ public class MySqlDataAccess implements DataAccess{
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException("Failed to configure data base");
+            throw new DataAccessException("Error: Failed to configure data base");
         }
     }
 
