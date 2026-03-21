@@ -1,4 +1,87 @@
 package ui;
 
+import client.ClientMain;
+import client.ServerFacade;
+
+import java.util.Scanner;
+
 public class PostLogin {
+    private final ServerFacade server;
+    private final Scanner scanner;
+    private final ClientMain client;
+
+    public PostLogin(ServerFacade server, Scanner scanner, ClientMain client){
+        this.server = server;
+        this.scanner = scanner;
+        this.client = client;
+    }
+    public void eval(String input){
+        switch(input){
+            case "help":
+                help();
+                break;
+            case "logout":
+                logout();
+                break;
+            case "create":
+                create();
+                break;
+            case "listGames":
+                listGames();
+                break;
+            case "play":
+                play();
+                break;
+            case "observe":
+                observe();
+                break;
+            default:
+                System.out.println("Unknown command");
+        }
+    }
+
+    public void help(){
+        System.out.println("Commands:");
+        System.out.println("help - show commands");
+        System.out.println("logout - logout");
+        System.out.println("create - create game");
+        System.out.println("list - list games");
+        System.out.println("play - join game");
+        System.out.println("observe - observe game");
+    }
+    public void logout(){
+        server.logout(client.getAuthToken());
+        client.logout();
+    }
+    public void create(){
+        try {
+            System.out.print("Enter Game Name: ");
+            String gameName = scanner.nextLine();
+            server.createGame(client.getAuthToken(), gameName);
+            System.out.println("Game Created");
+        } catch (Exception e) {
+            System.out.println("Game creation failed");
+        }
+    }
+    public void listGames(){
+        try {
+            server.listGames(client.getAuthToken());
+        } catch (Exception e) {
+            System.out.println("Game listing failed");
+        }
+    }
+    public void play(){
+        try{
+            System.out.print("Enter Game Color: ");
+            String color = scanner.nextLine();
+            System.out.print("Enter Game Number: ");
+            String gameNumber = scanner.nextLine();
+            server.joinGame(client.getAuthToken(), color, Integer.parseInt(gameNumber));
+        } catch (Exception e) {
+            System.out.println("Game join failed");
+        }
+    }
+    public void observe(){
+        System.out.println("Observe Game");
+    }
 }
