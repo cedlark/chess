@@ -95,7 +95,11 @@ public class ServerFacade {
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws Exception{
         var status = response.statusCode();
         if(status < 200 || status >= 300){
-            throw new Exception("Request failed: "+status);
+            String message = response.body();
+            if(message == null || message.isBlank()){
+                message = "Request failed: " + status;
+            }
+            throw new Exception(message);
         }
         if(responseClass != null){
             return new Gson().fromJson(response.body(), responseClass);

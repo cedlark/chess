@@ -2,7 +2,12 @@ package ui;
 
 import client.ChessClient;
 import client.ServerFacade;
+import com.google.gson.JsonArray;
+import model.GameData;
+import service.GamesResult;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PostLogin {
@@ -64,20 +69,51 @@ public class PostLogin {
         }
     }
     public void listGames(){
-        try {
-            server.listGames(client.getAuthToken());
-        } catch (Exception e) {
+        try{
+            GamesResult result = server.listGames(client.getAuthToken());
+            List<GameData> currentGames = result.games();
+            if(currentGames.isEmpty()){
+                System.out.println("No games found");
+                return;
+            }
+            for(int i=0;i<currentGames.size();i++){
+                GameData gameData = currentGames.get(i);
+                String white = gameData.getWhiteUsername() == null ? "-" : gameData.getWhiteUsername();
+                String black = gameData.getBlackUsername() == null ? "-" : gameData.getBlackUsername();
+                System.out.println((i+1)+". "+ gameData.getGameName()+ " | White: "+white+ " | Black: "+black);
+            }
+        }
+        catch(Exception e){
             System.out.println("Game listing failed");
         }
     }
     public void play(){
         try{
-            System.out.print("Enter Game Color: ");
-            String color = scanner.nextLine();
+            GamesResult result = server.listGames(client.getAuthToken());
+            List<GameData> currentGames = result.games();
+            if(currentGames == null || currentGames.isEmpty()){
+                System.out.println("No games available");
+                return;
+            }
+            for(int i=0;i<currentGames.size();i++){
+                GameData gameData = currentGames.get(i);
+                String white = gameData.getWhiteUsername()==null ? "-" : gameData.getWhiteUsername();
+                String black = gameData.getBlackUsername()==null ? "-" : gameData.getBlackUsername();
+                System.out.println((i+1)+". "+ gameData.getGameName()+ " | White: "+white+ " | Black: "+black);
+            }
             System.out.print("Enter Game Number: ");
-            String gameNumber = scanner.nextLine();
-            server.joinGame(client.getAuthToken(), color, Integer.parseInt(gameNumber));
-        } catch (Exception e) {
+            int number = Integer.parseInt(scanner.nextLine());
+            if(number < 1 || number > currentGames.size()){
+                System.out.println("Invalid game number");
+                return;
+            }
+            System.out.print("Enter Game Color: ");
+            String color = scanner.nextLine().toLowerCase();
+            GameData game = currentGames.get(number-1);
+            server.joinGame(client.getAuthToken(), color, game.getGameId());
+            System.out.println("Joined game");
+        }
+        catch(Exception e){
             System.out.println("Game join failed");
         }
     }
