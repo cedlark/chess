@@ -1,22 +1,21 @@
 package client;
 import java.util.Scanner;
-import chess.*;
+
 import ui.PostLogin;
 import ui.PreLogin;
 
-public class ClientMain {
-    private final ServerFacade server;
+public class ChessClient {
     private final Scanner scanner;
 
     private boolean loggedIn = false;
     private String authToken = null;
 
-    private PreLogin preLogin;
-    private PostLogin postLogin;
+    private final PreLogin preLogin;
+    private final PostLogin postLogin;
 
-    public ChessClient(int port){
+    public ChessClient(String serverUrl){
 
-        server = new ServerFacade(port);
+        ServerFacade server = new ServerFacade(serverUrl);
 
         scanner = new Scanner(System.in);
 
@@ -26,7 +25,7 @@ public class ClientMain {
 
     }
 
-    public void run() {
+    public void run() throws Exception {
         System.out.println("Welcome to Chess! Type 'help' to get started.");
         while (true) {
             System.out.print("> ");

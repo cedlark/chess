@@ -1,22 +1,21 @@
 package ui;
 
-import client.ClientMain;
+import client.ChessClient;
 import client.ServerFacade;
-import model.AuthData;
 
 import java.util.Scanner;
 
 public class PreLogin {
     private final ServerFacade server;
     private final Scanner scanner;
-    private final ClientMain client;
+    private final ChessClient client;
 
-    public PreLogin(ServerFacade server, Scanner scanner, ClientMain client){
+    public PreLogin(ServerFacade server, Scanner scanner, ChessClient client){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
     }
-    public void eval(String input){
+    public void eval(String input) throws Exception {
         switch(input){
             case "help":
                 help();
@@ -53,13 +52,23 @@ public class PreLogin {
 
     }
     public void register(){
-        System.out.print("Enter Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Enter Email: ");
-        String email = scanner.nextLine();
-        var authData = server.register(username, password, email);
-        client.loginSuccess(authData.getAuthToken());
+        try{
+            System.out.print("Enter Username: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter Password: ");
+            String password = scanner.nextLine();
+            System.out.print("Enter Email: ");
+            String email = scanner.nextLine();
+            var authData = server.register(username,password,email);
+            client.loginSuccess(authData.getAuthToken());
+        }
+        catch(Exception e){
+            if(e.getMessage().contains("already taken")){
+                System.out.println("Username already taken");
+            }
+            else{
+                System.out.println(e.getMessage());
+            }
+        }
     }
 }

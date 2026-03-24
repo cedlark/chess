@@ -1,6 +1,6 @@
 package ui;
 
-import client.ClientMain;
+import client.ChessClient;
 import client.ServerFacade;
 
 import java.util.Scanner;
@@ -8,14 +8,14 @@ import java.util.Scanner;
 public class PostLogin {
     private final ServerFacade server;
     private final Scanner scanner;
-    private final ClientMain client;
+    private final ChessClient client;
 
-    public PostLogin(ServerFacade server, Scanner scanner, ClientMain client){
+    public PostLogin(ServerFacade server, Scanner scanner, ChessClient client){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
     }
-    public void eval(String input){
+    public void eval(String input) throws Exception {
         switch(input){
             case "help":
                 help();
@@ -26,7 +26,7 @@ public class PostLogin {
             case "create":
                 create();
                 break;
-            case "listGames":
+            case "list":
                 listGames();
                 break;
             case "play":
@@ -49,7 +49,7 @@ public class PostLogin {
         System.out.println("play - join game");
         System.out.println("observe - observe game");
     }
-    public void logout(){
+    public void logout() throws Exception {
         server.logout(client.getAuthToken());
         client.logout();
     }
