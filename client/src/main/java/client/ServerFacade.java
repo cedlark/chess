@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import server.JoinGameBody;
 import service.*;
 
 import java.net.URI;
@@ -54,14 +55,14 @@ public class ServerFacade {
         handleResponse(response,null);
     }
 
-    public void joinGame(String authToken, String color, int gameID) throws Exception {
+    public void joinGame(String authToken, String color, Integer gameID) throws Exception {
         ChessGame.TeamColor teamColor;
-        if (color.equals("white")){
+        if (color.equalsIgnoreCase("white")){
             teamColor = ChessGame.TeamColor.WHITE;
         } else {
             teamColor = ChessGame.TeamColor.BLACK;
         }
-        var body = new JoinRequest(authToken, teamColor, gameID);
+        var body = new JoinGameBody(teamColor.toString(), gameID);
         var request = buildRequest("PUT","/game",body,authToken);
         var response = sendRequest(request);
         handleResponse(response,null);

@@ -114,7 +114,7 @@ public class PostLogin {
             System.out.println("Joined game");
         }
         catch(Exception e){
-            System.out.println("Game join failed");
+            System.out.println("Game join failed "+ e.getMessage());
         }
     }
     public void observe(){
