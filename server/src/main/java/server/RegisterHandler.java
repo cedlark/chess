@@ -2,9 +2,9 @@ package server;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import com.google.gson.Gson;
+import requests.RegisterRequest;
+import requests.RegisterResult;
 import service.*;
-
-import java.util.Map;
 
 public class RegisterHandler {
     private final UserService userService;

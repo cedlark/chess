@@ -3,10 +3,10 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import requests.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

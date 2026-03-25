@@ -3,7 +3,7 @@ package client;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
-import service.GamesResult;
+import requests.GamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 

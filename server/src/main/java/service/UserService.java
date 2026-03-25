@@ -4,8 +4,8 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
+import requests.*;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class UserService {

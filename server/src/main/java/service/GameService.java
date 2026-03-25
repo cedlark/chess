@@ -2,8 +2,8 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDataAccess;
 import model.*;
+import requests.*;
 
 public class GameService {
     private final DataAccess dao;

@@ -7,7 +7,7 @@ import chess.ChessPosition;
 import client.ChessClient;
 import client.ServerFacade;
 import model.GameData;
-import service.GamesResult;
+import requests.GamesResult;
 
 import java.io.PrintStream;
 import java.util.List;
