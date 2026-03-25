@@ -27,7 +27,7 @@ public class ServerFacadeTests {
     }
     @BeforeEach
     void clearDatabase() throws Exception {
-
+        facade.clear();
     }
 
 

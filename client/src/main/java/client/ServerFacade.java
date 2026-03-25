@@ -67,10 +67,19 @@ public class ServerFacade {
         var response = sendRequest(request);
         handleResponse(response,null);
     }
+
+    public void clear() throws Exception {
+        var request = buildRequest("DELETE", "/db",null, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
+
+
+
+
     private HttpRequest buildRequest(String method, String path, Object body, String authToken){
-        var request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + path))
-                .method(method, makeRequestBody(body));
+        var request = HttpRequest.newBuilder().uri(URI.create(serverUrl + path)).method(method, makeRequestBody(body));
         if(body != null){
             request.setHeader("Content-Type", "application/json");
         }
