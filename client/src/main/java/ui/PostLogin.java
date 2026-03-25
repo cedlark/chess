@@ -79,12 +79,7 @@ public class PostLogin {
                 System.out.println("No games found");
                 return;
             }
-            for(int i=0;i<currentGames.size();i++){
-                GameData gameData = currentGames.get(i);
-                String white = gameData.getWhiteUsername() == null ? "-" : gameData.getWhiteUsername();
-                String black = gameData.getBlackUsername() == null ? "-" : gameData.getBlackUsername();
-                System.out.println((i+1)+". "+ gameData.getGameName()+ " | White: "+white+ " | Black: "+black);
-            }
+            printGames(currentGames);
         }
         catch(Exception e){
             System.out.println("Game listing failed");
@@ -98,12 +93,7 @@ public class PostLogin {
                 System.out.println("No games available");
                 return;
             }
-            for(int i=0;i<currentGames.size();i++){
-                GameData gameData = currentGames.get(i);
-                String white = gameData.getWhiteUsername()==null ? "-" : gameData.getWhiteUsername();
-                String black = gameData.getBlackUsername()==null ? "-" : gameData.getBlackUsername();
-                System.out.println((i+1)+". "+ gameData.getGameName()+ " | White: "+white+ " | Black: "+black);
-            }
+            printGames(currentGames);
             System.out.print("Enter Game Number: ");
             int number = Integer.parseInt(scanner.nextLine());
             if(number < 1 || number > currentGames.size()){
@@ -129,12 +119,7 @@ public class PostLogin {
                 System.out.println("No games available");
                 return;
             }
-            for(int i=0;i<games.size();i++){
-                GameData g = games.get(i);
-                System.out.println((i+1)+". "+ g.getGameName()+ " | White: "+
-                        (g.getWhiteUsername()==null?"-":g.getWhiteUsername())+ " | Black: "+
-                        (g.getBlackUsername()==null?"-":g.getBlackUsername()));
-            }
+            printGames(games);
             System.out.print("Enter Game Number: ");
             int number = Integer.parseInt(scanner.nextLine());
 
@@ -148,6 +133,17 @@ public class PostLogin {
         }
         catch(Exception e){
             System.out.println("Observe failed");
+        }
+    }
+    private void printGames(List<GameData> games){
+        for(int i = 0; i < games.size(); i++){
+            GameData g = games.get(i);
+            String white = g.getWhiteUsername()==null ? "-" : g.getWhiteUsername();
+            String black = g.getBlackUsername()==null ? "-" : g.getBlackUsername();
+
+            System.out.println((i+1)+". "+ g.getGameName() +
+                    " | White: "+white +
+                    " | Black: "+black);
         }
     }
 
