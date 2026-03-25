@@ -31,6 +31,10 @@ public class ChessClient {
             System.out.print("> ");
             String input = scanner.nextLine();
             if (input.equals("quit")) {
+
+                if(loggedIn){
+                    postLogin.logout();
+                }
                 break;
             }
             if(!loggedIn){
