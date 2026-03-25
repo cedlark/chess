@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
+import requests.JoinGameBody;
 import service.GameService;
 import requests.JoinRequest;
 

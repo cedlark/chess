@@ -4,11 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
-import requests.GamesResult;
-import requests.LoginRequest;
-import requests.MakeGameRequest;
-import requests.RegisterRequest;
-import server.JoinGameBody;
+import requests.*;
 
 
 import java.net.URI;
