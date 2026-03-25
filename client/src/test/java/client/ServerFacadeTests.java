@@ -3,6 +3,7 @@ package client;
 import model.AuthData;
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.GamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -45,6 +46,65 @@ public class ServerFacadeTests {
                 facade.register("player1", "password", "p1@email.com"));
         assertNotNull(ex.getMessage());
     }
+    @Test
+    void loginSuccess() throws Exception {
+        facade.register("player1", "password", "p1@email.com");
+        AuthData auth = facade.login("player1", "password");
+        assertNotNull(auth);
+        assertNotNull(auth.getAuthToken());
+        assertEquals("player1", auth.getUsername());
+    }
 
-
+    @Test
+    void loginFailure() {
+        Exception ex = assertThrows(Exception.class, () -> facade.login("George", "Washington"));
+        assertNotNull(ex.getMessage());
+    }
+    @Test
+    void logoutSuccess() throws Exception {
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+        assertDoesNotThrow(() -> facade.logout(auth.getAuthToken()));
+    }
+    @Test
+    void logoutFailure() {
+        Exception ex = assertThrows(Exception.class, () -> facade.logout("bad-token"));
+        assertNotNull(ex.getMessage());
+    }
+    @Test
+    void listGamesSuccess() throws Exception {
+        AuthData auth = facade.register("Ben", "Franklin", "p1@email.com");
+        GamesResult result = facade.listGames(auth.getAuthToken());
+        assertNotNull(result);
+        assertNotNull(result.games());
+    }
+    @Test
+    void listGamesFailure() {
+        Exception ex = assertThrows(Exception.class, () -> facade.listGames("bad-token"));
+        assertNotNull(ex.getMessage());
+    }
+    @Test
+    void createGameSuccess()throws Exception {
+        AuthData auth = facade.register("Dipper", "Pines", "hehe");
+        assertDoesNotThrow(()-> facade.createGame(auth.getAuthToken(), "Good-Game"));
+    }
+    @Test
+    void createGameFailure() {
+        Exception ex = assertThrows(Exception.class, () ->
+                facade.createGame("Me", "Test Game"));
+        assertNotNull(ex.getMessage());
+    }
+    @Test
+    void joinGameSuccess() throws Exception {
+        AuthData auth = facade.register("player1", "password", "p1@email.com");
+        facade.createGame(auth.getAuthToken(), "Test Game");
+        GamesResult result = facade.listGames(auth.getAuthToken());
+        int gameID = result.games().getFirst().getGameId();
+        assertDoesNotThrow(() -> facade.joinGame(auth.getAuthToken(), "white", gameID));
+    }
+    @Test
+    void joinGameFailure() {
+        Exception ex = assertThrows(Exception.class, () ->
+                facade.joinGame("bad-token", "white", 999));
+        assertNotNull(ex.getMessage());
+    }
 }
