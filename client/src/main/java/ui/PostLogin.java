@@ -102,6 +102,10 @@ public class PostLogin {
             }
             System.out.print("Enter Game Color: ");
             String color = scanner.nextLine().toLowerCase();
+            if(!color.equals("white") && !color.equals("black")){
+                System.out.println("Invalid game color");
+                return;
+            }
             GameData game = currentGames.get(number-1);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
             System.out.println("Joined game");
@@ -169,7 +173,7 @@ public class PostLogin {
             for(int col = startCol;
                 col != endCol;
                 col += colStep){
-                boolean light = (row + col) % 2 == 0;
+                boolean light = (row + col) % 2 != 0;
                 setSquareColor(out, light);
                 ChessPosition pos = new ChessPosition(row,col);
                 ChessPiece piece = board.getPiece(pos);
