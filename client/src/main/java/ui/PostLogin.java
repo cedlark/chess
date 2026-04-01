@@ -103,7 +103,7 @@ public class PostLogin {
             }
             GameData game = currentGames.get(number-1);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
-            new InGame(server, scanner, client, game).PlayGame();
+            new InGame(server, scanner, client, game,color).PlayGame();
 
         }
         catch(Exception e){
@@ -127,7 +127,7 @@ public class PostLogin {
                 return;
             }
             GameData game = games.get(number-1);
-            new InGame(server, scanner, client, game).ObserveGame();
+            new InGame(server, scanner, client, game, "white").ObserveGame();
             System.out.println("Observing game");
 
         }

@@ -12,12 +12,14 @@ public class InGame {
     private final Scanner scanner;
     private final ChessClient client;
     private final GameData game;
+    private final String color;
 
-    public InGame(ServerFacade server, Scanner scanner, ChessClient client, GameData game){
+    public InGame(ServerFacade server, Scanner scanner, ChessClient client, GameData game, String color){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
         this.game = game;
+        this.color = color;
     }
     public void PlayGame(){
         System.out.println("Joined Game");
@@ -67,8 +69,9 @@ public class InGame {
         System.out.println("highlight - highlight legal moves");
     }
     public void redraw(){
-        client.drawBoard(game, )
+        client.drawBoard(game, color);
     }
+
 
 
 
