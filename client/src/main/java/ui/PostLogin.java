@@ -108,6 +108,7 @@ public class PostLogin {
             }
             GameData game = currentGames.get(number-1);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
+            new InGame(server, scanner, client, game).PlayGame();
             System.out.println("Joined game");
             drawBoard(game, color);
         }
