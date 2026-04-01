@@ -66,6 +66,9 @@ public class InGame {
         System.out.println("resign - give up");
         System.out.println("highlight - highlight legal moves");
     }
+    public void redraw(){
+        client.drawBoard(game, )
+    }
 
 
 
