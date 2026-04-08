@@ -19,38 +19,47 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-//need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
 
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+    public WebSocketFacade(String url, NotificationHandler handler) throws ResponseException {
         try {
-            ServerMessage base = gson.fromJson(message, ServerMessage.class);
-            switch(base.getServerMessageType()){
-                case LOAD_GAME:
-                    LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
-                    handler.loadGame(load);
-                    break;
-
-                case NOTIFICATION:
-                    NotificationMessage note = gson.fromJson(message, NotificationMessage.class);
-                    handler.notify(note);
-                    break;
-
-                case ERROR:
-                    ErrorMessage err = gson.fromJson(message, ErrorMessage.class);
-                    handler.error(err);
-                    break;
-            }
-        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            url = url.replace("http","ws");
+            URI socketURI = new URI(url + "/ws");
+            this.notificationHandler = handler;
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, socketURI);
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                public void onMessage(String message){
+                    handleMessage(message);
+                }
+            });
+        }
+        catch(Exception ex){
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+    public void handleMessage(String message){
+        Gson gson = new Gson();
+        ServerMessage base = gson.fromJson(message, ServerMessage.class);
+        switch(base.getServerMessageType()){
+            case LOAD_GAME:
+                LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
+                notificationHandler.loadGame(load);
+                break;
+            case NOTIFICATION:
+                NotificationMessage note = gson.fromJson(message, NotificationMessage.class);
+                break;
+            case ERROR:
+                ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
+                break;
+        }
     }
 
     public void enterGame(String authToken, int gameID) throws IOException {
@@ -70,13 +79,17 @@ public class WebSocketFacade extends Endpoint {
         session.getBasicRemote().sendText(new Gson().toJson(cmd));
 
     }
+    public void resign(String authToken, int gameID) throws IOException {
+        UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        session.getBasicRemote().sendText(new Gson().toJson(resign));
+    }
 
-    public void leaveGame(String visitorName) throws ResponseException {
+    public void leaveGame(String authToken, int gameID) throws IOException {
         try {
-            var action = new Action(Action.Type.EXIT, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            session.getBasicRemote().sendText(new Gson().toJson(leave));
         } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            throw new IOException(IOException.Code.ServerError, ex.getMessage());
         }
     }
 
