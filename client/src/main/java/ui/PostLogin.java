@@ -1,15 +1,17 @@
 package ui;
 
 import client.ChessClient;
+import client.NotificationHandler;
 import client.ServerFacade;
 import client.WebSocketFacade;
 import model.GameData;
 import requests.GamesResult;
 
+
 import java.util.List;
 import java.util.Scanner;
 
-public class PostLogin {
+public class PostLogin{
     private final ServerFacade server;
     private final Scanner scanner;
     private final ChessClient client;
@@ -20,7 +22,7 @@ public class PostLogin {
         this.server = server;
         this.scanner = scanner;
         this.client = client;
-        ws = new WebSocketFacade(serverUrl, this);
+        ws = new WebSocketFacade(serverUrl, client);
 
     }
     public void eval(String input) throws Exception {
@@ -134,7 +136,8 @@ public class PostLogin {
                 return;
             }
             GameData game = games.get(number-1);
-            ws.observeGame(game);
+            ws.observeGame(client.getAuthToken(), game.getGameId());
+            new InGame(server, scanner, client, game, "observe", ws).PlayGame();
             System.out.println("Observing game");
 
         }
@@ -153,6 +156,7 @@ public class PostLogin {
                     " | Black: "+black);
         }
     }
+
 
 
 }

@@ -37,8 +37,30 @@ public class InGame {
                 leave();
                 break;
             }
-            eval(input);
+            if (color.equalsIgnoreCase("observe")){
+                observeEval(input);
+            }else {
+                eval(input);
+            }
         }
+    }
+    private void observeEval(String input){
+        switch(input){
+            case "help":
+                obHelp();
+                break;
+            case "redraw":
+                redraw();
+                break;
+            default:
+                System.out.println("Unknown command");
+        }
+    }
+    private void obHelp(){
+        System.out.println("Commands:");
+        System.out.println("help - show commands");
+        System.out.println("redraw - redraws chess board");
+        System.out.println("leave - leave game");
     }
     private void eval(String input){
         switch(input){

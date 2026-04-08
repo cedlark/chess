@@ -10,8 +10,11 @@ import model.GameData;
 import ui.EscapeSequences;
 import ui.PostLogin;
 import ui.PreLogin;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler{
     private final Scanner scanner;
 
     private boolean loggedIn = false;
@@ -71,7 +74,8 @@ public class ChessClient {
         var out = new PrintStream(System.out);
         out.print(EscapeSequences.ERASE_SCREEN);
         ChessBoard board = game.getGame().getBoard();
-        boolean whitePerspective = color.equalsIgnoreCase("white");
+        boolean whitePerspective = color.equalsIgnoreCase("white") ||
+                color.equalsIgnoreCase("observe");
         drawHeaders(out, whitePerspective);
 
         int startRow = whitePerspective ? 8 : 1;
@@ -155,5 +159,14 @@ public class ChessClient {
                 case PAWN -> EscapeSequences.SET_TEXT_COLOR_RED + EscapeSequences.BLACK_PAWN;
             };
         }
+    }
+    public void loadGame(LoadGameMessage message, String color){
+        drawBoard(message.getGame(), color);
+    }
+    public void notify(NotificationMessage message){
+        System.out.println(message.getNotification());
+    }
+    public void error(ErrorMessage message){
+        System.out.println(message.getError());
     }
 }

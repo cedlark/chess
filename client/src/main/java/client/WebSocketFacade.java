@@ -1,13 +1,10 @@
 package client;
 
-import chess.ChessGame;
+
 import chess.ChessMove;
 import com.google.gson.Gson;
-import exception.ResponseException;
 import jakarta.websocket.*;
-import model.AuthData;
-import webSocketMessages.Action;
-import webSocketMessages.Notification;
+
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -17,14 +14,14 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
+
 
 public class WebSocketFacade extends Endpoint {
 
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url, NotificationHandler handler) throws ResponseException {
+    public WebSocketFacade(String url, NotificationHandler handler) {
         try {
             url = url.replace("http","ws");
             URI socketURI = new URI(url + "/ws");
@@ -38,7 +35,7 @@ public class WebSocketFacade extends Endpoint {
             });
         }
         catch(Exception ex){
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            System.out.println("error" + ex);
         }
     }
 
