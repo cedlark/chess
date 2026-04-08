@@ -15,7 +15,7 @@ public class PreLogin {
         this.scanner = scanner;
         this.client = client;
     }
-    public void eval(String input) throws Exception {
+    public void eval(String input){
         switch(input){
             case "help":
                 help();

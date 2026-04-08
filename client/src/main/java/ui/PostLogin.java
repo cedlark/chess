@@ -1,7 +1,6 @@
 package ui;
 
 import client.ChessClient;
-import client.NotificationHandler;
 import client.ServerFacade;
 import client.WebSocketFacade;
 import model.GameData;
@@ -111,7 +110,7 @@ public class PostLogin{
             GameData game = currentGames.get(number-1);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
             ws.enterGame(client.getAuthToken(), game.getGameId());
-            new InGame(server, scanner, client, game, color, ws).PlayGame();
+            new InGame(scanner, client, game, color, ws).PlayGame();
 
 
         }
@@ -137,7 +136,7 @@ public class PostLogin{
             }
             GameData game = games.get(number-1);
             ws.observeGame(client.getAuthToken(), game.getGameId());
-            new InGame(server, scanner, client, game, "observe", ws).PlayGame();
+            new InGame(scanner, client, game, "observe", ws).PlayGame();
             System.out.println("Observing game");
 
         }

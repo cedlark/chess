@@ -28,11 +28,7 @@ public class WebSocketFacade extends Endpoint {
             this.notificationHandler = handler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                public void onMessage(String message){
-                    handleMessage(message);
-                }
-            });
+            this.session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
         }
         catch(Exception ex){
             System.out.println("error" + ex);

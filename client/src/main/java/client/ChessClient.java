@@ -1,11 +1,9 @@
 package client;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Scanner;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 import ui.EscapeSequences;
 import ui.PostLogin;
@@ -23,6 +21,8 @@ public class ChessClient implements NotificationHandler{
     private final PreLogin preLogin;
     private final PostLogin postLogin;
 
+    private String currentColor;
+
     public ChessClient(String serverUrl){
 
         ServerFacade server = new ServerFacade(serverUrl);
@@ -31,7 +31,7 @@ public class ChessClient implements NotificationHandler{
 
         preLogin = new PreLogin(server, scanner, this);
 
-        postLogin = new PostLogin(server, scanner, this);
+        postLogin = new PostLogin(server, scanner, this, serverUrl);
 
     }
 
@@ -69,11 +69,11 @@ public class ChessClient implements NotificationHandler{
         return authToken;
     }
 
-
-    public void drawBoard(GameData game, String color){
+    public void drawBoard(GameData game, String color, Collection<ChessMove> moves){
         var out = new PrintStream(System.out);
         out.print(EscapeSequences.ERASE_SCREEN);
         ChessBoard board = game.getGame().getBoard();
+        currentColor = color;
         boolean whitePerspective = color.equalsIgnoreCase("white") ||
                 color.equalsIgnoreCase("observe");
         drawHeaders(out, whitePerspective);
@@ -90,12 +90,32 @@ public class ChessClient implements NotificationHandler{
             row != endRow;
             row += rowStep){
             out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + " " + row + " ");
-            for(int col = startCol;
-                col != endCol;
-                col += colStep){
-                boolean light = (row + col) % 2 != 0;
-                setSquareColor(out, light);
+            for(int col = startCol; col != endCol; col += colStep){
                 ChessPosition pos = new ChessPosition(row,col);
+                boolean light = (row + col) % 2 != 0;
+                boolean isSelected = false;
+                boolean isLegal = false;
+                if(moves != null && !moves.isEmpty()){
+                    ChessPosition start = moves.iterator().next().getStartPosition();
+                    if(pos.equals(start)){
+                        isSelected = true;
+                    }
+                    for(ChessMove move : moves){
+                        if (pos.equals(move.getEndPosition())) {
+                            isLegal = true;
+                            break;
+                        }
+                    }
+                }
+                if(isSelected){
+                    out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
+                }
+                else if(isLegal){
+                    out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                }
+                else{
+                    setSquareColor(out, light);
+                }
                 ChessPiece piece = board.getPiece(pos);
                 out.print(getPieceString(piece));
             }
@@ -160,8 +180,8 @@ public class ChessClient implements NotificationHandler{
             };
         }
     }
-    public void loadGame(LoadGameMessage message, String color){
-        drawBoard(message.getGame(), color);
+    public void loadGame(LoadGameMessage message){
+        drawBoard(message.getGame(), currentColor, null);
     }
     public void notify(NotificationMessage message){
         System.out.println(message.getNotification());

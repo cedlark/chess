@@ -3,25 +3,23 @@ package ui;
 import chess.ChessMove;
 import chess.ChessPosition;
 import client.ChessClient;
-import client.ServerFacade;
 import client.WebSocketFacade;
 import model.GameData;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class InGame {
-    private final ServerFacade server;
     private final Scanner scanner;
     private final ChessClient client;
     private final GameData game;
     private final String color;
     private final WebSocketFacade ws;
 
-    public InGame(ServerFacade server, Scanner scanner, ChessClient client,
+    public InGame(Scanner scanner, ChessClient client,
                   GameData game, String color, WebSocketFacade ws){
-        this.server = server;
         this.scanner = scanner;
         this.client = client;
         this.game = game;
@@ -62,7 +60,7 @@ public class InGame {
         System.out.println("redraw - redraws chess board");
         System.out.println("leave - leave game");
     }
-    private void eval(String input){
+    private void eval(String input) throws IOException {
         switch(input){
             case "help":
                 help();
@@ -98,10 +96,10 @@ public class InGame {
         System.out.println("highlight - highlight legal moves");
     }
     public void redraw(){
-        client.drawBoard(game, color);
+        client.drawBoard(game, color, null);
     }
 
-    public void makeMove() throws IOException {
+    public void makeMove(){
         System.out.println("row of piece to move");
         String sr = scanner.nextLine();
         System.out.println("column of piece to move");
@@ -134,8 +132,8 @@ public class InGame {
         System.out.println("Column");
         String col = scanner.nextLine();
         ChessPosition pos = new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
-        var moves = game.getGame().validMoves(pos);
-        client.drawHighlighted(game, color, moves);
+        Collection<ChessMove> moves = game.getGame().validMoves(pos);
+        client.drawBoard(game, color, moves);
     }
     public void leave() throws IOException {
         ws.leaveGame(client.getAuthToken(), game.getGameId());
