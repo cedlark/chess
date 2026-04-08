@@ -59,26 +59,26 @@ public class WebSocketFacade extends Endpoint {
 
     public void enterGame(String authToken, int gameID) throws IOException {
         UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-        session.getBasicRemote().sendText(new Gson().toJson(connect));
-
+        System.out.println(new Gson().toJson(connect));
+        this.session.getBasicRemote().sendText(new Gson().toJson(connect));
     }
     public void observeGame(String authToken, int gameID) throws IOException {
         UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-        session.getBasicRemote().sendText(new Gson().toJson(connect));
+        this.session.getBasicRemote().sendText(new Gson().toJson(connect));
     }
     public void makeMove(ChessMove move, String authToken, int gameID) throws IOException {
         MakeMoveCommand cmd = new MakeMoveCommand(authToken, gameID, move);
-        session.getBasicRemote().sendText(new Gson().toJson(cmd));
+        this.session.getBasicRemote().sendText(new Gson().toJson(cmd));
 
     }
     public void resign(String authToken, int gameID) throws IOException {
         UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
-        session.getBasicRemote().sendText(new Gson().toJson(resign));
+        this.session.getBasicRemote().sendText(new Gson().toJson(resign));
     }
 
     public void leaveGame(String authToken, int gameID) throws IOException {
         UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
-        session.getBasicRemote().sendText(new Gson().toJson(leave));
+        this.session.getBasicRemote().sendText(new Gson().toJson(leave));
 
     }
 

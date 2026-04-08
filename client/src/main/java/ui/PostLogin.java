@@ -110,6 +110,7 @@ public class PostLogin{
             GameData game = currentGames.get(number-1);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
             ws.enterGame(client.getAuthToken(), game.getGameId());
+            System.out.println("Join Game Web Socket");
             new InGame(scanner, client, game, color, ws).PlayGame();
 
 
