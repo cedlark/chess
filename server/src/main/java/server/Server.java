@@ -7,6 +7,7 @@ import dataaccess.MemoryDataAccess;
 import dataaccess.MySqlDataAccess;
 import io.javalin.*;
 import io.javalin.json.JavalinGson;
+import server.websocket.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -42,6 +43,13 @@ public class Server {
             javalin.post("/game", createGameHandler::handle);
             javalin.put("/game", joinGameHandler::handle);
             javalin.delete("/db", clearHandler::handle);
+            WebSocketHandler wsHandler = new WebSocketHandler(dao);
+            javalin.ws("/ws", ws -> {
+                ws.onConnect(wsHandler::handleConnect);
+                ws.onMessage(wsHandler::handleMessage);
+                ws.onClose(wsHandler::handleClose);
+
+            });
         } catch (DataAccessException e) {
             System.out.println("Failed to start server: " + e.getMessage());
         }
