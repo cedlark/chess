@@ -72,6 +72,18 @@ public class InGame {
         client.drawBoard(game, color);
     }
 
+    public void makeMove(){
+
+    }
+    public void resign(){
+
+    }
+    public void highlight(){
+
+    }
+    public void leave(){
+
+    }
 
 
 

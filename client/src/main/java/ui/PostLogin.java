@@ -2,6 +2,7 @@ package ui;
 
 import client.ChessClient;
 import client.ServerFacade;
+import client.WebSocketFacade;
 import model.GameData;
 import requests.GamesResult;
 
@@ -12,11 +13,13 @@ public class PostLogin {
     private final ServerFacade server;
     private final Scanner scanner;
     private final ChessClient client;
+    private final WebSocketFacade ws;
 
     public PostLogin(ServerFacade server, Scanner scanner, ChessClient client){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
+        ws = new WebSocketFacade(serverUrl, this);
     }
     public void eval(String input) throws Exception {
         switch(input){
@@ -102,8 +105,8 @@ public class PostLogin {
                 return;
             }
             GameData game = currentGames.get(number-1);
-            server.joinGame(client.getAuthToken(), color, game.getGameId());
-            new InGame(server, scanner, client, game,color).PlayGame();
+            ws.enterGame(game, color);
+
 
         }
         catch(Exception e){
@@ -127,7 +130,7 @@ public class PostLogin {
                 return;
             }
             GameData game = games.get(number-1);
-            new InGame(server, scanner, client, game, "white").ObserveGame();
+            ws.observeGame(game);
             System.out.println("Observing game");
 
         }
