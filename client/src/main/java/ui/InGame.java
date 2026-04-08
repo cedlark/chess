@@ -1,11 +1,15 @@
 package ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.ChessClient;
 import client.ServerFacade;
 import model.GameData;
 
 import java.util.Objects;
 import java.util.Scanner;
+
+import static java.io.IO.print;
 
 public class InGame {
     private final ServerFacade server;
@@ -73,16 +77,40 @@ public class InGame {
     }
 
     public void makeMove(){
+        System.out.println("row of piece to move");
+        String sr = scanner.nextLine();
+        System.out.println("column of piece to move");
+        String sc = scanner.nextLine();
+        System.out.println("row of new square");
+        String er = scanner.nextLine();
+        System.out.println("column of new square");
+        String ec = scanner.nextLine();
+        ChessPosition start = new ChessPosition(Integer.parseInt(sr),Integer.parseInt(sc));
+        ChessPosition end = new ChessPosition(Integer.parseInt(er),Integer.parseInt(ec));
+        ChessMove move = new ChessMove(start, end, null);
+        ws.makeMove(move, client.getAuthToken(), game.getGameId());
 
     }
     public void resign(){
+        System.out.println("confirm resign yes/no");
+        String confirm = scanner.nextLine();
+        if (confirm.equals("yes")){
+            ws.resign();
+        }
 
     }
     public void highlight(){
-
+        System.out.println("Row");
+        String row = scanner.nextLine();
+        System.out.println("Column");
+        String col = scanner.nextLine();
+        ChessPosition pos = new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
+        var moves = game.getGame().validMoves(pos);
+        client.drawHighlighted(game, color, moves);
     }
     public void leave(){
-
+        ws.leaveGame();
+        System.out.println("Left Game");
     }
 
 
