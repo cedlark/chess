@@ -14,12 +14,15 @@ public class PostLogin {
     private final Scanner scanner;
     private final ChessClient client;
     private final WebSocketFacade ws;
+    private final String serverUrl;
 
-    public PostLogin(ServerFacade server, Scanner scanner, ChessClient client){
+    public PostLogin(ServerFacade server, Scanner scanner, ChessClient client, String serverUrl, String serverUrl1){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
+        this.serverUrl = serverUrl;
         ws = new WebSocketFacade(serverUrl, this);
+
     }
     public void eval(String input) throws Exception {
         switch(input){
