@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 import model.AuthData;
 import model.GameData;
@@ -72,14 +73,8 @@ public class WebSocketHandler
 
     private void connect(UserGameCommand cmd, Session session) throws Exception{
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        if(auth == null){
-            connections.send(session, new ErrorMessage("Invalid auth"));
-            return;
-        }
-        GameData game = dataAccess.getGame(cmd.getGameID());
-
-        if(game == null){
-            connections.send(session, new ErrorMessage("Game not found"));
+        GameData game= dataAccess.getGame(cmd.getGameID());
+        if (checkCmd(cmd, session)){
             return;
         }
         connections.add(cmd.getGameID(), auth.getUsername(), session);
@@ -88,40 +83,79 @@ public class WebSocketHandler
         connections.broadcast(cmd.getGameID(), session, new NotificationMessage(message));
     }
 
-    private void makeMove(MakeMoveCommand cmd, Session session) throws Exception{
+    private void makeMove(MakeMoveCommand cmd, Session session) throws Exception {
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        if(auth == null){
-            connections.send(session, new ErrorMessage("auth not valid"));
-            return;
-        }
         GameData gameData = dataAccess.getGame(cmd.getGameID());
-        if(gameData == null){
-            connections.send(session, new ErrorMessage("Game not found"));
+        if (checkCmd(cmd, session)){
             return;
         }
+        String username = auth.getUsername();
         ChessGame game = gameData.getGame();
         ChessMove move = cmd.getMove();
-        game.makeMove(move);
+        if(move == null){
+            connections.send(session, new ErrorMessage("Move required"));
+            return;
+        }
+        boolean colorWhite = username.equals(gameData.getWhiteUsername());
+        boolean colorBlack = username.equals(gameData.getBlackUsername());
+        if(!colorWhite && !colorBlack){
+            connections.send(session, new ErrorMessage("Observers cannot make moves"));
+            return;
+        }
+        ChessGame.TeamColor playerColor = colorWhite ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        if(game.getTeamTurn() != playerColor){
+            connections.send(session, new ErrorMessage("Not your turn"));
+            return;
+        }
+        try{
+            game.makeMove(move);
+        }
+        catch(Exception e){
+            connections.send(session, new ErrorMessage("Invalid move"));
+            return;
+        }
         dataAccess.updateGame(cmd.getGameID(), gameData);
         connections.broadcastAll(cmd.getGameID(), new LoadGameMessage(gameData));
-        connections.broadcast(cmd.getGameID(), session, new NotificationMessage(auth.getUsername() + " made a move"));
+        connections.broadcast(cmd.getGameID(), session, new NotificationMessage(username + " made a move"));
+        ChessGame.TeamColor nextTurn = game.getTeamTurn();
+        String nextPlayer = nextTurn == ChessGame.TeamColor.WHITE ?
+                gameData.getWhiteUsername() : gameData.getBlackUsername();
+        if(game.isInCheckmate(nextTurn)){
+            connections.broadcastAll(cmd.getGameID(), new NotificationMessage(nextPlayer + " is in checkmate"));
+        }
+        else if(game.isInStalemate(nextTurn)){
+            connections.broadcastAll(cmd.getGameID(), new NotificationMessage("Stalemate"));
+        }
+        else if(game.isInCheck(nextTurn)){
+            connections.broadcastAll(cmd.getGameID(), new NotificationMessage(nextPlayer + " is in check"));
+        }
+    }
+    private boolean checkCmd(UserGameCommand cmd, Session session) throws DataAccessException, IOException {
+        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+        GameData gameData = dataAccess.getGame(cmd.getGameID());
+        if(auth == null){
+            connections.send(session, new ErrorMessage("Invalid auth"));
+            return true;
+        }
+        if(gameData == null){
+            connections.send(session, new ErrorMessage("Game not found"));
+            return true;
+        }
+        return false;
     }
 
     private void leave(UserGameCommand cmd, Session session) throws Exception{
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        if(auth == null){
-            connections.send(session, new ErrorMessage("Invalid auth"));
+        if (checkCmd(cmd, session)){
             return;
         }
-        GameData game = dataAccess.getGame(cmd.getGameID());
         connections.remove(session);
         connections.broadcast(cmd.getGameID(), session, new NotificationMessage(auth.getUsername() + " left the game"));
     }
 
     private void resign(UserGameCommand cmd, Session session) throws Exception{
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        if(auth == null){
-            connections.send(session, new ErrorMessage("Invalid auth"));
+        if (checkCmd(cmd,session)){
             return;
         }
         connections.broadcastAll(cmd.getGameID(), new NotificationMessage(auth.getUsername() + " resigned"));
