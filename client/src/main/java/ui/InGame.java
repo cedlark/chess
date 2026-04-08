@@ -4,12 +4,12 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import client.ChessClient;
 import client.ServerFacade;
+import client.WebSocketFacade;
 import model.GameData;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
-
-import static java.io.IO.print;
 
 public class InGame {
     private final ServerFacade server;
@@ -17,15 +17,18 @@ public class InGame {
     private final ChessClient client;
     private final GameData game;
     private final String color;
+    private final WebSocketFacade ws;
 
-    public InGame(ServerFacade server, Scanner scanner, ChessClient client, GameData game, String color){
+    public InGame(ServerFacade server, Scanner scanner, ChessClient client,
+                  GameData game, String color, WebSocketFacade ws){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
         this.game = game;
         this.color = color;
+        this.ws = ws;
     }
-    public void PlayGame(){
+    public void PlayGame() throws IOException {
         System.out.println("Joined Game");
         while (true) {
             System.out.print("> ");
@@ -76,7 +79,7 @@ public class InGame {
         client.drawBoard(game, color);
     }
 
-    public void makeMove(){
+    public void makeMove() throws IOException {
         System.out.println("row of piece to move");
         String sr = scanner.nextLine();
         System.out.println("column of piece to move");
@@ -88,14 +91,18 @@ public class InGame {
         ChessPosition start = new ChessPosition(Integer.parseInt(sr),Integer.parseInt(sc));
         ChessPosition end = new ChessPosition(Integer.parseInt(er),Integer.parseInt(ec));
         ChessMove move = new ChessMove(start, end, null);
-        ws.makeMove(move, client.getAuthToken(), game.getGameId());
+        try {
+            ws.makeMove(move, client.getAuthToken(), game.getGameId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
-    public void resign(){
+    public void resign() throws IOException {
         System.out.println("confirm resign yes/no");
         String confirm = scanner.nextLine();
         if (confirm.equals("yes")){
-            ws.resign();
+            ws.resign(client.getAuthToken(), game.getGameId());
         }
 
     }
@@ -108,8 +115,8 @@ public class InGame {
         var moves = game.getGame().validMoves(pos);
         client.drawHighlighted(game, color, moves);
     }
-    public void leave(){
-        ws.leaveGame();
+    public void leave() throws IOException {
+        ws.leaveGame(client.getAuthToken(), game.getGameId());
         System.out.println("Left Game");
     }
 

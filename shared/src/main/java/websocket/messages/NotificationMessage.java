@@ -3,13 +3,13 @@ package websocket.messages;
 import model.GameData;
 
 public class NotificationMessage extends ServerMessage{
-    private final String note;
+    private final String message;
 
-    public NotificationMessage(String note){
+    public NotificationMessage(String message){
         super(ServerMessageType.NOTIFICATION);
-        this.note = note;
+        this.message = message;
     }
     public String getNotification(){
-        return note;
+        return message;
     }
 }

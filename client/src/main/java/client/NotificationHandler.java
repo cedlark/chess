@@ -1,7 +1,16 @@
 package client;
 
-import webSocketMessages.Notification;
+
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 public interface NotificationHandler {
-    void notify(Notification notification);
+
+    void loadGame(LoadGameMessage message);
+
+    void notify(NotificationMessage message);
+
+    void error(ErrorMessage message);
+
 }

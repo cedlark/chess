@@ -14,13 +14,12 @@ public class PostLogin {
     private final Scanner scanner;
     private final ChessClient client;
     private final WebSocketFacade ws;
-    private final String serverUrl;
 
-    public PostLogin(ServerFacade server, Scanner scanner, ChessClient client, String serverUrl, String serverUrl1){
+
+    public PostLogin(ServerFacade server, Scanner scanner, ChessClient client, String serverUrl){
         this.server = server;
         this.scanner = scanner;
         this.client = client;
-        this.serverUrl = serverUrl;
         ws = new WebSocketFacade(serverUrl, this);
 
     }
@@ -108,7 +107,9 @@ public class PostLogin {
                 return;
             }
             GameData game = currentGames.get(number-1);
-            ws.enterGame(game, color);
+            server.joinGame(client.getAuthToken(), color, game.getGameId());
+            ws.enterGame(client.getAuthToken(), game.getGameId());
+            new InGame(server, scanner, client, game, color, ws).PlayGame();
 
 
         }

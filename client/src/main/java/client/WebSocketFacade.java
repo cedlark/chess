@@ -55,26 +55,25 @@ public class WebSocketFacade extends Endpoint {
                 break;
             case NOTIFICATION:
                 NotificationMessage note = gson.fromJson(message, NotificationMessage.class);
+                notificationHandler.notify(note);
                 break;
             case ERROR:
                 ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
+                notificationHandler.error(error);
                 break;
         }
     }
 
     public void enterGame(String authToken, int gameID) throws IOException {
-        try {
-            UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-            session.getBasicRemote().sendText(new Gson().toJson(connect));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
-        }
+        UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+        session.getBasicRemote().sendText(new Gson().toJson(connect));
+
     }
     public void observeGame(String authToken, int gameID) throws IOException {
         UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
         session.getBasicRemote().sendText(new Gson().toJson(connect));
     }
-    public void makeMove(ChessMove move, String authToken, int gameID){
+    public void makeMove(ChessMove move, String authToken, int gameID) throws IOException {
         MakeMoveCommand cmd = new MakeMoveCommand(authToken, gameID, move);
         session.getBasicRemote().sendText(new Gson().toJson(cmd));
 
@@ -85,12 +84,9 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void leaveGame(String authToken, int gameID) throws IOException {
-        try {
-            UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
-            session.getBasicRemote().sendText(new Gson().toJson(leave));
-        } catch (IOException ex) {
-            throw new IOException(IOException.Code.ServerError, ex.getMessage());
-        }
+        UserGameCommand leave = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        session.getBasicRemote().sendText(new Gson().toJson(leave));
+
     }
 
 }
