@@ -84,9 +84,11 @@ public class ChessClient implements NotificationHandler{
         out.print(EscapeSequences.ERASE_SCREEN);
         ChessBoard board = game.getGame().getBoard();
         currentColor = color;
+        System.out.println();
         boolean whitePerspective = color.equalsIgnoreCase("white") ||
                 color.equalsIgnoreCase("observe");
         drawHeaders(out, whitePerspective);
+
 
         int startRow = whitePerspective ? 8 : 1;
         int endRow   = whitePerspective ? 0 : 9;
@@ -200,6 +202,7 @@ public class ChessClient implements NotificationHandler{
         System.out.print("> ");
     }
     public void error(ErrorMessage message){
-        System.out.println("SERVER ERROR: ");
+        System.out.println(message.getErrorMessage());
+        System.out.print("> ");
     }
 }

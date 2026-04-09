@@ -1,6 +1,8 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ChessClient;
 import client.WebSocketFacade;
@@ -117,10 +119,28 @@ public class InGame {
             }
             int startCol = sc.toLowerCase().charAt(0) - 'a' + 1;
             int endCol = ec.toLowerCase().charAt(0) - 'a' + 1;
+            int startRow = Integer.parseInt(sr);
+            int endRow = Integer.parseInt(er);
 
             ChessPosition start = new ChessPosition(Integer.parseInt(sr), startCol);
             ChessPosition end = new ChessPosition(Integer.parseInt(er), endCol);
-            ChessMove move = new ChessMove(start, end, null);
+            ChessPiece.PieceType promotion = null;
+            ChessPiece piece = client.getCurrentGame().getGame().getBoard().getPiece(start);
+            if(piece != null && piece.getPieceType() == ChessPiece.PieceType.PAWN){
+                boolean whitePromotes = piece.getTeamColor() == ChessGame.TeamColor.WHITE && endRow == 8;
+                boolean blackPromotes = piece.getTeamColor() == ChessGame.TeamColor.BLACK && endRow == 1;
+                if(whitePromotes || blackPromotes){
+                    Collection<ChessMove> valid = client.getCurrentGame().getGame().validMoves(start);
+                    boolean isValid = valid.stream().anyMatch(m -> m.getEndPosition().equals(end));
+                    if(!isValid){
+                        System.out.println("Invalid move");
+                        return;
+                    }
+                    promotion = askPromotion();
+                    if(promotion == null) return;
+                }
+            }
+            ChessMove move = new ChessMove(start, end, promotion);
             try {
                 ws.makeMove(move, client.getAuthToken(), client.getCurrentGame().getGameId());
             } catch (IOException e) {
@@ -130,6 +150,24 @@ public class InGame {
             System.out.println("Error making the move" + e);
         }
 
+    }
+    private ChessPiece.PieceType askPromotion(){
+        System.out.println("Pawn promotion! Choose a piece:");
+        System.out.println("1 - Queen");
+        System.out.println("2 - Rook");
+        System.out.println("3 - Bishop");
+        System.out.println("4 - Knight");
+        String choice = scanner.nextLine();
+        return switch(choice){
+            case "1" -> ChessPiece.PieceType.QUEEN;
+            case "2" -> ChessPiece.PieceType.ROOK;
+            case "3" -> ChessPiece.PieceType.BISHOP;
+            case "4" -> ChessPiece.PieceType.KNIGHT;
+            default -> {
+                System.out.println("Invalid choice");
+                yield null;
+            }
+        };
     }
     public void resign() throws IOException {
         System.out.println("confirm resign yes/no");
