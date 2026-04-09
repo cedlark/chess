@@ -24,7 +24,7 @@ public class InGame {
         this.color = color;
         this.ws = ws;
     }
-    public void PlayGame() throws IOException {
+    public void playGame() throws IOException {
         ws.enterGame(client.getAuthToken(), client.getCurrentGame().getGameId());
         System.out.println("Joined Game");
         while (true) {

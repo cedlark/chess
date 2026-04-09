@@ -101,31 +101,9 @@ public class ChessClient implements NotificationHandler{
             row += rowStep){
             out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + " " + row + " ");
             for(int col = startCol; col != endCol; col += colStep){
-                ChessPosition pos = new ChessPosition(row,col);
+                ChessPosition pos = new ChessPosition(row, col);
                 boolean light = (row + col) % 2 != 0;
-                boolean isSelected = false;
-                boolean isLegal = false;
-                if(moves != null && !moves.isEmpty()){
-                    ChessPosition start = moves.iterator().next().getStartPosition();
-                    if(pos.equals(start)){
-                        isSelected = true;
-                    }
-                    for(ChessMove move : moves){
-                        if (pos.equals(move.getEndPosition())) {
-                            isLegal = true;
-                            break;
-                        }
-                    }
-                }
-                if(isSelected){
-                    out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
-                }
-                else if(isLegal){
-                    out.print(EscapeSequences.SET_BG_COLOR_GREEN);
-                }
-                else{
-                    setSquareColor(out, light);
-                }
+                out.print(getSquareBackground(pos, moves, light));
                 ChessPiece piece = board.getPiece(pos);
                 out.print(getPieceString(piece));
             }
@@ -135,6 +113,23 @@ public class ChessClient implements NotificationHandler{
         }
         drawHeaders(out, whitePerspective);
     }
+
+    private String getSquareBackground(ChessPosition pos, Collection<ChessMove> moves, boolean light) {
+        if (moves != null && !moves.isEmpty()) {
+            ChessPosition start = moves.iterator().next().getStartPosition();
+            if (pos.equals(start)) {
+                return EscapeSequences.SET_BG_COLOR_YELLOW;
+            }
+            for (ChessMove move : moves) {
+                if (pos.equals(move.getEndPosition())) {
+                    return EscapeSequences.SET_BG_COLOR_GREEN;
+                }
+            }
+        }
+        return light ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK :
+                EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE;
+    }
+
     private void drawHeaders(PrintStream out, boolean whitePerspective){
         out.print("   ");
         if(whitePerspective){

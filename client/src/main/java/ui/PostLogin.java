@@ -112,7 +112,7 @@ public class PostLogin{
             client.setCurrentColor(color);
             server.joinGame(client.getAuthToken(), color, game.getGameId());
             ws.enterGame(client.getAuthToken(), game.getGameId());
-            new InGame(scanner, client, color, ws).PlayGame();
+            new InGame(scanner, client, color, ws).playGame();
 
 
         }
@@ -139,8 +139,8 @@ public class PostLogin{
             GameData game = games.get(number-1);
             client.setCurrentGame(game);
             client.setCurrentColor("observe");
-            ws.observeGame(client.getAuthToken(), game.getGameId());
-            new InGame(scanner, client, "observe", ws).PlayGame();
+            ws.enterGame(client.getAuthToken(), game.getGameId());
+            new InGame(scanner, client, "observe", ws).playGame();
 
         }
         catch(Exception e){
