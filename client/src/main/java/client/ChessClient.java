@@ -22,6 +22,7 @@ public class ChessClient implements NotificationHandler{
     private final PostLogin postLogin;
 
     private String currentColor;
+    private GameData currentGame;
 
     public ChessClient(String serverUrl){
 
@@ -33,6 +34,15 @@ public class ChessClient implements NotificationHandler{
 
         postLogin = new PostLogin(server, scanner, this, serverUrl);
 
+    }
+    public GameData getCurrentGame(){
+        return currentGame;
+    }
+    public void setCurrentGame(GameData game){
+        currentGame = game;
+    }
+    public void setCurrentColor(String color){
+        currentColor = color;
     }
 
     public void run() throws Exception {
@@ -181,12 +191,31 @@ public class ChessClient implements NotificationHandler{
         }
     }
     public void loadGame(LoadGameMessage message){
-        drawBoard(message.getGame(), currentColor, null);
+        System.out.println("CLIENT UPDATING GAME STATE");
+
+        GameData gameData = message.getGame();
+
+        this.currentGame = new GameData(
+                gameData.getGameId(),
+                gameData.getWhiteUsername(),
+                gameData.getBlackUsername(),
+                gameData.getGameName(),
+                gameData.getGame()
+        );
+
+        System.out.println("NEW GAME STATE RECEIVED");
+
+        redraw();
+    }
+    public void redraw(){
+        drawBoard(currentGame, currentColor, null);
     }
     public void notify(NotificationMessage message){
+        System.out.println();
         System.out.println(message.getNotification());
+        System.out.print("> ");
     }
     public void error(ErrorMessage message){
-        System.out.println(message.getError());
+        System.out.println("SERVER ERROR: " + message.getError());
     }
 }

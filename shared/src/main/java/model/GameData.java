@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class GameData {
     private final int gameID;
-    private final String whiteUsername;
-    private final String blackUsername;
+    private String whiteUsername;
+    private String blackUsername;
     private final String gameName;
-    private final ChessGame game;
+    private ChessGame game;
     public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
         this.gameID = gameID;
         this.whiteUsername = whiteUsername;
@@ -33,6 +33,15 @@ public class GameData {
         return game;
     }
 
+    public void setWhiteUsername(String username){
+        whiteUsername = username;
+    }
+    public void setBlackUsername(String username){
+        blackUsername = username;
+    }
+    public void setGame(ChessGame newGame){
+        game = newGame;
+    }
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof GameData gameData)) {

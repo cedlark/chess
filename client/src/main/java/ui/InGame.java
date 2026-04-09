@@ -5,28 +5,27 @@ import chess.ChessPosition;
 import client.ChessClient;
 import client.WebSocketFacade;
 import model.GameData;
-
+import java.util.List;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
 public class InGame {
     private final Scanner scanner;
     private final ChessClient client;
-    private final GameData game;
     private final String color;
     private final WebSocketFacade ws;
 
-    public InGame(Scanner scanner, ChessClient client,
-                  GameData game, String color, WebSocketFacade ws){
+    public InGame(Scanner scanner, ChessClient client, String color, WebSocketFacade ws){
         this.scanner = scanner;
         this.client = client;
-        this.game = game;
         this.color = color;
         this.ws = ws;
     }
     public void PlayGame() throws IOException {
+        ws.enterGame(client.getAuthToken(), client.getCurrentGame().getGameId());
         System.out.println("Joined Game");
         while (true) {
             System.out.print("> ");
@@ -96,25 +95,40 @@ public class InGame {
         System.out.println("highlight - highlight legal moves");
     }
     public void redraw(){
-        client.drawBoard(game, color, null);
+        client.drawBoard(client.getCurrentGame(), color, null);
     }
 
     public void makeMove(){
-        System.out.println("row of piece to move");
-        String sr = scanner.nextLine();
-        System.out.println("column of piece to move");
-        String sc = scanner.nextLine();
-        System.out.println("row of new square");
-        String er = scanner.nextLine();
-        System.out.println("column of new square");
-        String ec = scanner.nextLine();
-        ChessPosition start = new ChessPosition(Integer.parseInt(sr),Integer.parseInt(sc));
-        ChessPosition end = new ChessPosition(Integer.parseInt(er),Integer.parseInt(ec));
-        ChessMove move = new ChessMove(start, end, null);
         try {
-            ws.makeMove(move, client.getAuthToken(), game.getGameId());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+            List<String> letters = List.of("a","b","c","d","e","f","g","h");
+            List<String> numbers = List.of("1","2","3","4","5","6","7","8");
+            System.out.println("row of piece to move");
+            String sr = scanner.nextLine();
+            System.out.println("column of piece to move");
+            String sc = scanner.nextLine().toLowerCase();
+            System.out.println("row of new square");
+            String er = scanner.nextLine();
+            System.out.println("column of new square");
+            String ec = scanner.nextLine().toLowerCase();
+            if(!numbers.contains(sr) || !numbers.contains(er) || !letters.contains(sc) || !letters.contains(ec)){
+                System.out.println("Invalid move");
+                return;
+            }
+            int startCol = sc.toLowerCase().charAt(0) - 'a' + 1;
+            int endCol = ec.toLowerCase().charAt(0) - 'a' + 1;
+
+            ChessPosition start = new ChessPosition(Integer.parseInt(sr), startCol);
+            ChessPosition end = new ChessPosition(Integer.parseInt(er), endCol);
+            ChessMove move = new ChessMove(start, end, null);
+            System.out.println(move);
+            try {
+                ws.makeMove(move, client.getAuthToken(), client.getCurrentGame().getGameId());
+            } catch (IOException e) {
+                System.out.println("make move failed" + e);
+            }
+        } catch (Exception e){
+            System.out.println("Error making the move" + e);
         }
 
     }
@@ -122,7 +136,7 @@ public class InGame {
         System.out.println("confirm resign yes/no");
         String confirm = scanner.nextLine();
         if (confirm.equals("yes")){
-            ws.resign(client.getAuthToken(), game.getGameId());
+            ws.resign(client.getAuthToken(), client.getCurrentGame().getGameId());
         }
 
     }
@@ -131,12 +145,13 @@ public class InGame {
         String row = scanner.nextLine();
         System.out.println("Column");
         String col = scanner.nextLine();
-        ChessPosition pos = new ChessPosition(Integer.parseInt(row), Integer.parseInt(col));
-        Collection<ChessMove> moves = game.getGame().validMoves(pos);
-        client.drawBoard(game, color, moves);
+        int column = col.toLowerCase().charAt(0) - 'a' + 1;
+        ChessPosition pos = new ChessPosition(Integer.parseInt(row), column);
+        Collection<ChessMove> moves = client.getCurrentGame().getGame().validMoves(pos);
+        client.drawBoard(client.getCurrentGame(), color, moves);
     }
     public void leave() throws IOException {
-        ws.leaveGame(client.getAuthToken(), game.getGameId());
+        ws.leaveGame(client.getAuthToken(), client.getCurrentGame().getGameId());
         System.out.println("Left Game");
     }
 

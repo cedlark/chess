@@ -40,6 +40,7 @@ public class WebSocketHandler
     }
     @Override
     public void handleMessage(WsMessageContext ctx){
+        System.out.println("SERVER RECEIVED RAW: " + ctx.message());
         try{
             UserGameCommand base = gson.fromJson(ctx.message(), UserGameCommand.class);
             switch(base.getCommandType()) {
@@ -72,26 +73,32 @@ public class WebSocketHandler
     }
 
     private void connect(UserGameCommand cmd, Session session) throws Exception{
-        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        GameData game= dataAccess.getGame(cmd.getGameID());
         if (checkCmd(cmd, session)){
             return;
         }
+        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+        GameData game= dataAccess.getGame(cmd.getGameID());
+
         connections.add(cmd.getGameID(), auth.getUsername(), session);
         connections.send(session, new LoadGameMessage(game));
         String message = buildConnectMessage(auth.getUsername(), game);
         connections.broadcast(cmd.getGameID(), session, new NotificationMessage(message));
+        System.out.println("CONNECTED: " + auth.getUsername());
     }
 
     private void makeMove(MakeMoveCommand cmd, Session session) throws Exception {
-        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        GameData gameData = dataAccess.getGame(cmd.getGameID());
+
         if (checkCmd(cmd, session)){
             return;
         }
+        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+        GameData gameData = dataAccess.getGame(cmd.getGameID());
+
         String username = auth.getUsername();
         ChessGame game = gameData.getGame();
         ChessMove move = cmd.getMove();
+        System.out.println("SERVER PROCESSING MOVE");
+        System.out.println("MOVE OBJECT: " + cmd.getMove());
         if(move == null){
             connections.send(session, new ErrorMessage("Move required"));
             return;
@@ -114,6 +121,7 @@ public class WebSocketHandler
             connections.send(session, new ErrorMessage("Invalid move"));
             return;
         }
+        gameData.setGame(game);
         dataAccess.updateGame(cmd.getGameID(), gameData);
         connections.broadcastAll(cmd.getGameID(), new LoadGameMessage(gameData));
         connections.broadcast(cmd.getGameID(), session, new NotificationMessage(username + " made a move"));
@@ -145,19 +153,31 @@ public class WebSocketHandler
     }
 
     private void leave(UserGameCommand cmd, Session session) throws Exception{
-        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+
         if (checkCmd(cmd, session)){
             return;
         }
+        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+        GameData gameData = dataAccess.getGame(cmd.getGameID());
+
+        String username = auth.getUsername();
+        if(username.equals(gameData.getWhiteUsername())){
+            gameData.setWhiteUsername(null);
+        }
+        else if(username.equals(gameData.getBlackUsername())){
+            gameData.setBlackUsername(null);
+        }
+        dataAccess.updateGame(cmd.getGameID(),gameData);
         connections.remove(session);
-        connections.broadcast(cmd.getGameID(), session, new NotificationMessage(auth.getUsername() + " left the game"));
+        connections.broadcast(cmd.getGameID(), session, new NotificationMessage(username + " left the game"));
     }
 
     private void resign(UserGameCommand cmd, Session session) throws Exception{
-        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-        if (checkCmd(cmd,session)){
+        if (checkCmd(cmd, session)){
             return;
         }
+        AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
+
         connections.broadcastAll(cmd.getGameID(), new NotificationMessage(auth.getUsername() + " resigned"));
     }
 
