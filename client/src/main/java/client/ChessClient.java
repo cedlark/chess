@@ -150,14 +150,6 @@ public class ChessClient implements NotificationHandler{
         out.print(EscapeSequences.RESET_TEXT_COLOR);
         out.println();
     }
-    private void setSquareColor(PrintStream out, boolean light){
-        if(light){
-            out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK);
-        }
-        else{
-            out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE);
-        }
-    }
     private String getPieceString(ChessPiece piece){
         if(piece == null){
             return EscapeSequences.EMPTY;
