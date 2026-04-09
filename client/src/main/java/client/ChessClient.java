@@ -191,7 +191,6 @@ public class ChessClient implements NotificationHandler{
         }
     }
     public void loadGame(LoadGameMessage message){
-        System.out.println("CLIENT UPDATING GAME STATE");
 
         GameData gameData = message.getGame();
 
@@ -202,8 +201,6 @@ public class ChessClient implements NotificationHandler{
                 gameData.getGameName(),
                 gameData.getGame()
         );
-
-        System.out.println("NEW GAME STATE RECEIVED");
 
         redraw();
     }
@@ -216,6 +213,6 @@ public class ChessClient implements NotificationHandler{
         System.out.print("> ");
     }
     public void error(ErrorMessage message){
-        System.out.println("SERVER ERROR: " + message.getError());
+        System.out.println("SERVER ERROR: ");
     }
 }

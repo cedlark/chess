@@ -121,7 +121,6 @@ public class InGame {
             ChessPosition start = new ChessPosition(Integer.parseInt(sr), startCol);
             ChessPosition end = new ChessPosition(Integer.parseInt(er), endCol);
             ChessMove move = new ChessMove(start, end, null);
-            System.out.println(move);
             try {
                 ws.makeMove(move, client.getAuthToken(), client.getCurrentGame().getGameId());
             } catch (IOException e) {

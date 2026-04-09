@@ -51,7 +51,6 @@ public class ConnectionManager {
     }
 
     public void send(Session session, ServerMessage msg) throws IOException{
-        System.out.println("SERVER SENDING TO CLIENT: " + msg);
         if(session != null && session.isOpen()){
             session.getRemote().sendString(new Gson().toJson(msg));
         }
@@ -60,16 +59,12 @@ public class ConnectionManager {
     public void broadcast(int gameID, Session exclude, ServerMessage msg) throws IOException{
         var gameSessions = connections.get(gameID);
         if(gameSessions == null){
-            System.out.println("broadcast: no sessions for game " + gameID);
             return;
         }
 
         String json = new Gson().toJson(msg);
-        System.out.println("broadcast: sending to game " + gameID);
-        System.out.println("broadcast payload: " + json);
 
         for(Session s : gameSessions.keySet()){
-            System.out.println("broadcast session open? " + s.isOpen() + ", excluded? " + s.equals(exclude));
             if(s.isOpen() && !s.equals(exclude)){
                 s.getRemote().sendString(json);
             }
@@ -78,16 +73,12 @@ public class ConnectionManager {
     public void broadcastAll(int gameID, ServerMessage msg) throws IOException{
         var gameSessions = connections.get(gameID);
         if(gameSessions == null){
-            System.out.println("broadcastAll: no sessions for game " + gameID);
             return;
         }
 
         String json = new Gson().toJson(msg);
-        System.out.println("broadcastAll: sending to " + gameSessions.size() + " sessions");
-        System.out.println("broadcastAll payload: " + json);
 
         for(Session s : gameSessions.keySet()){
-            System.out.println("broadcastAll session open? " + s.isOpen());
             if(s.isOpen()){
                 s.getRemote().sendString(json);
             }

@@ -28,42 +28,35 @@ public class WebSocketFacade extends Endpoint {
             this.notificationHandler = handler;
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             Session s = container.connectToServer(this, socketURI);
-            System.out.println("CONNECTED SESSION " + s.getId());
 
         } catch(Exception ex){
-            System.out.println("error " + ex);
+            System.out.println("error ");
         }
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        System.out.println("CLIENT onOpen called: " + session.getId());
         this.session = session;
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
-                System.out.println("CLIENT MESSAGE HANDLER INVOKED: " + message);
                 handleMessage(message);
             }
         });
     }
     public void handleMessage(String message){
-        System.out.println("CLIENT RECEIVED RAW: " + message);
         Gson gson = new Gson();
         ServerMessage base = gson.fromJson(message, ServerMessage.class);
         switch(base.getServerMessageType()){
             case LOAD_GAME:
-                System.out.println("CLIENT RECEIVED LOAD_GAME");
                 LoadGameMessage load = gson.fromJson(message, LoadGameMessage.class);
                 notificationHandler.loadGame(load);
                 break;
             case NOTIFICATION:
-                System.out.println("CLIENT RECEIVED NOTIFICATION");
                 NotificationMessage note = gson.fromJson(message, NotificationMessage.class);
                 notificationHandler.notify(note);
                 break;
             case ERROR:
-                System.out.println("CLIENT RECEIVED ERROR");
                 ErrorMessage error = gson.fromJson(message, ErrorMessage.class);
                 notificationHandler.error(error);
                 break;
@@ -71,7 +64,6 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void enterGame(String authToken, int gameID) throws IOException {
-        System.out.println("FACADE ENTER GAME");
         UserGameCommand connect = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
         this.session.getBasicRemote().sendText(new Gson().toJson(connect));
     }
@@ -80,12 +72,9 @@ public class WebSocketFacade extends Endpoint {
         this.session.getBasicRemote().sendText(new Gson().toJson(connect));
     }
     public void makeMove(ChessMove move, String authToken, int gameID) throws IOException {
-        System.out.println("FACADE INSTANCE " + this);
         MakeMoveCommand cmd = new MakeMoveCommand(authToken, gameID, move);
         String json = new Gson().toJson(cmd);
-        System.out.println("CLIENT JSON SENT: " + json);
         this.session.getBasicRemote().sendText(json);
-        System.out.println("end of WebSocketFacade");
     }
     public void resign(String authToken, int gameID) throws IOException {
         UserGameCommand resign = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);

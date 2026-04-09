@@ -40,7 +40,6 @@ public class WebSocketHandler
     }
     @Override
     public void handleMessage(WsMessageContext ctx){
-        System.out.println("SERVER RECEIVED RAW: " + ctx.message());
         try{
             UserGameCommand base = gson.fromJson(ctx.message(), UserGameCommand.class);
             switch(base.getCommandType()) {
@@ -93,12 +92,13 @@ public class WebSocketHandler
         }
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
         GameData gameData = dataAccess.getGame(cmd.getGameID());
-
+        if(gameData.getGame().getIsGameOver()){
+            connections.send(session, new ErrorMessage("Game is already over"));
+            return;
+        }
         String username = auth.getUsername();
         ChessGame game = gameData.getGame();
         ChessMove move = cmd.getMove();
-        System.out.println("SERVER PROCESSING MOVE");
-        System.out.println("MOVE OBJECT: " + cmd.getMove());
         if(move == null){
             connections.send(session, new ErrorMessage("Move required"));
             return;
@@ -129,9 +129,13 @@ public class WebSocketHandler
         String nextPlayer = nextTurn == ChessGame.TeamColor.WHITE ?
                 gameData.getWhiteUsername() : gameData.getBlackUsername();
         if(game.isInCheckmate(nextTurn)){
+            game.setIsGameOver(true);
+            dataAccess.updateGame(cmd.getGameID(), gameData);
             connections.broadcastAll(cmd.getGameID(), new NotificationMessage(nextPlayer + " is in checkmate"));
         }
         else if(game.isInStalemate(nextTurn)){
+            game.setIsGameOver(true);
+            dataAccess.updateGame(cmd.getGameID(), gameData);
             connections.broadcastAll(cmd.getGameID(), new NotificationMessage("Stalemate"));
         }
         else if(game.isInCheck(nextTurn)){
@@ -177,8 +181,19 @@ public class WebSocketHandler
             return;
         }
         AuthData auth = dataAccess.getAuth(cmd.getAuthToken());
-
-        connections.broadcastAll(cmd.getGameID(), new NotificationMessage(auth.getUsername() + " resigned"));
+        GameData gameData = dataAccess.getGame(cmd.getGameID());
+        String username = auth.getUsername();
+        if(gameData.getGame().getIsGameOver()){
+            connections.send(session, new ErrorMessage("Game is already over"));
+            return;
+        }
+        if(!username.equals(gameData.getWhiteUsername()) && !username.equals(gameData.getBlackUsername())){
+            connections.send(session, new ErrorMessage("Observers cannot resign"));
+            return;
+        }
+        gameData.getGame().setIsGameOver(true);
+        dataAccess.updateGame(cmd.getGameID(), gameData);
+        connections.broadcastAll(cmd.getGameID(), new NotificationMessage(username + " resigned"));
     }
 
     private String buildConnectMessage(String username, GameData game){
